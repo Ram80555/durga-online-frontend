@@ -6,8 +6,10 @@
   <title>Durga Online - Login</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #121212; }
-    .login-card { width: 100%; max-width: 380px; padding: 25px; background: #1e1e1e; border-radius: 8px; border: 1px solid #333; color: white; }
+    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #121212; font-family: sans-serif; }
+    .login-card { width: 100%; max-width: 380px; padding: 25px; background: #1e1e1e; border-radius: 8px; border: 1px solid #333; color: white; box-sizing: border-box; }
+    input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
+    .btn-submit { width: 100%; padding: 12px; background: #28a745; border: none; font-weight: bold; color: white; border-radius: 4px; cursor: pointer; margin-top: 15px; }
   </style>
 </head>
 <body>
@@ -15,16 +17,23 @@
     <h2 style="text-align: center; color: #ffb400; margin-bottom: 20px;">DURGA ONLINE</h2>
     <input type="text" id="loginUser" placeholder="Username">
     <input type="password" id="loginPass" placeholder="Password">
-    <button class="btn btn-submit" onclick="handleLogin()" style="margin-top: 15px;">LOGIN</button>
+    <button class="btn-submit" onclick="handleLogin()">LOGIN</button>
   </div>
 
   <script>
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
 
     async function handleLogin() {
-      const username = document.getElementById('loginUser').value;
-      const password = document.getElementById('loginPass').value;
+      const username = document.getElementById('loginUser').value.trim();
+      const password = document.getElementById('loginPass').value.trim();
       if (!username || !password) return alert('Enter credentials');
+
+      // Admin Login Route Check
+      if (username === 'Vikram16' && (password === 'Rajput8932@' || password === 'Rajput8932')) {
+        sessionStorage.setItem('durgaAdminLoggedIn', 'true');
+        window.location.href = 'admin.html';
+        return;
+      }
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
@@ -32,18 +41,23 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
+        
         const data = await res.json();
+        
         if (res.ok) {
           localStorage.setItem('durgaUser', JSON.stringify(data.user));
-          if (data.user.role === 'admin') {
+          if (data.user && data.user.role === 'admin') {
             window.location.href = 'admin.html';
           } else {
             window.location.href = 'index.html';
           }
         } else {
-          alert(data.msg);
+          // If message is missing in backend response
+          alert(data.msg || data.message || 'Invalid Username or Password!');
         }
-      } catch (err) { alert('Backend Server Not Reachable'); }
+      } catch (err) { 
+        alert('Backend Server Not Reachable. Please try again in 10 seconds.'); 
+      }
     }
   </script>
 </body>
