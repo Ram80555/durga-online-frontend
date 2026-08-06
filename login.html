@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Durga Online - Login</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #121212; }
+    .login-card { width: 100%; max-width: 380px; padding: 25px; background: #1e1e1e; border-radius: 8px; border: 1px solid #333; color: white; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <h2 style="text-align: center; color: #ffb400; margin-bottom: 20px;">DURGA ONLINE</h2>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button class="btn btn-submit" onclick="handleLogin()" style="margin-top: 15px;">LOGIN</button>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'YOUR_RENDER_BACKEND_URL';
+
+    async function handleLogin() {
+      const username = document.getElementById('loginUser').value;
+      const password = document.getElementById('loginPass').value;
+      if (!username || !password) return alert('Enter credentials');
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.setItem('durgaUser', JSON.stringify(data.user));
+          if (data.user.role === 'admin') {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = 'index.html';
+          }
+        } else {
+          alert(data.msg);
+        }
+      } catch (err) { alert('Backend Server Not Reachable'); }
+    }
+  </script>
+</body>
+</html>

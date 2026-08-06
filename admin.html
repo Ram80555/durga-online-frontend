@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Durga Online - Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="top-bar">
+    <div class="brand">DURGA ONLINE ADMIN</div>
+    <div class="user-summary">Bal: 136364 | Upline: 2406832</div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h3>Create New Client</h3>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <input type="text" id="newUsername" placeholder="Client Username" style="flex: 2;">
+        <input type="password" id="newPassword" placeholder="Password" style="flex: 2;">
+        <button class="btn btn-deposit" onclick="createClient()" style="flex: 1;">CREATE</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Client List</h3>
+      <div id="clientListContainer">Loading clients...</div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://durga-online-backend.onrender.com';
+
+    async function loadClients() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/clients`);
+        const clients = await res.json();
+        let html = '';
+        clients.forEach(c => {
+          html += `
+            <div class="user-card">
+              <div class="user-header"><strong>USERNAME:</strong> ${c.username} | <strong>BAL:</strong> ${c.balance} | <strong>EXP:</strong> ${c.exposure}</div>
+              <div class="btn-container" style="margin-top: 8px;">
+                <button class="btn btn-deposit" onclick="updateCoins('${c._id}', 'add')">BANK DEPOSIT</button>
+                <button class="btn btn-withdraw" onclick="updateCoins('${c._id}', 'withdraw')">BANK WITHDRAW</button>
+                <button class="btn btn-statement">STATEMENT</button>
+                <button class="btn btn-primary">RESET PASSWORD</button>
+              </div>
+            </div>
+          `;
+        });
+        document.getElementById('clientListContainer').innerHTML = html;
+      } catch (err) {
+        document.getElementById('clientListContainer').innerText = 'Backend Connection Issue.';
+      }
+    }
+
+    async function createClient() {
+      const username = document.getElementById('newUsername').value;
+      const password = document.getElementById('newPassword').value;
+      if(!username || !password) return alert('Enter details');
+
+      const res = await fetch(`${BACKEND_URL}/api/admin/create-client`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      alert(data.msg);
+      loadClients();
+    }
+
+    async function updateCoins(userId, action) {
+      const coins = prompt(`Enter coins to ${action}:`);
+      if(!coins) return;
+
+      const res = await fetch(`${BACKEND_URL}/api/admin/update-coins`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, coins: Number(coins), action })
+      });
+      const data = await res.json();
+      alert(data.msg);
+      loadClients();
+    }
+
+    loadClients();
+  </script>
+</body>
+</html>

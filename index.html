@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Durga Online - Client Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="client-panel">
+  <div class="header">
+    <div class="brand">DURGA ONLINE</div>
+    <div class="user-summary">
+      <span>User: <strong id="uName">---</strong></span> | 
+      <span>Bal: <strong id="bal">0</strong> C</span> | 
+      <span>Exp: <strong id="exp">0</strong> C</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h3>Select Market Index</h3>
+      <div id="marketListContainer">Loading Markets...</div>
+    </div>
+
+    <div class="card" id="betSection" style="display:none;">
+      <h3 id="selectedMarketTitle">Place Bet</h3>
+      <div class="odds-box">
+        <div class="mode-box blue-box selected" id="singleMode" onclick="setMode('single')">Single Digit<br><small>(1 : 8)</small></div>
+        <div class="mode-box pink-box" id="doubleMode" onclick="setMode('double')">Double Digit<br><small>(1 : 80)</small></div>
+      </div>
+      <div style="margin-top: 15px;">
+        <p style="font-size: 14px; margin-bottom: 5px;">Mode Selected: <strong id="currentMode" style="color: #ffb400;">Single Digit (1:8)</strong></p>
+        <input type="text" id="digitInput" placeholder="Enter Digit (0-9 or 00-99)">
+        <input type="number" id="coinInput" placeholder="Enter Amount of Coins">
+        <button class="btn btn-submit" onclick="placeBet()">PLACE PREDICTION</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MARKETS_CONFIG = [
+      { name: 'KOSPI', openTime: '09:00', closeTime: '12:50', lockTime: '12:20' },
+      { name: 'HANG SENG', openTime: '10:00', closeTime: '13:45', lockTime: '13:15' },
+      { name: 'SENSEX', openTime: '11:00', closeTime: '15:30', lockTime: '15:00' },
+      { name: 'DAX', openTime: '17:00', closeTime: '22:00', lockTime: '21:30' },
+      { name: 'DOW JONES', openTime: '22:00', closeTime: '02:30', lockTime: '02:00' }
+    ];
+
+    let activeMarket = '';
+    let activeMode = 'single';
+    const BACKEND_URL = 'https://durga-online-backend.onrender.com';
+    
+    const userSession = JSON.parse(localStorage.getItem('durgaUser'));
+    if(!userSession) { window.location.href = 'login.html'; }
+
+    document.getElementById('uName').innerText = userSession.username;
+    document.getElementById('bal').innerText = userSession.balance;
+    document.getElementById('exp').innerText = userSession.exposure;
+
+    function checkMarketStatus(openTimeStr, lockTimeStr) {
+      const now = new Date();
+      const istOffset = 5.5 * 60 * 60 * 1000;
+      const istTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
+      const currentMinutes = istTime.getHours() * 60 + istTime.getMinutes();
+
+      const [openH, openM] = openTimeStr.split(':').map(Number);
+      const openMinutes = openH * 60 + openM;
+      const [lockH, lockM] = lockTimeStr.split(':').map(Number);
+      const lockMinutes = lockH * 60 + lockM;
+
+      if (openMinutes > lockMinutes) {
+        return currentMinutes >= openMinutes || currentMinutes < lockMinutes;
+      }
+      return currentMinutes >= openMinutes && currentMinutes < lockMinutes;
+    }
+
+    async function fetchLiveRates() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/market/live-rates`);
+        const data = await res.json();
+        if (data.success) renderMarkets(data.rates);
+      } catch (err) { renderMarkets(); }
+    }
+
+    function renderMarkets(liveRates = {}) {
+      const container = document.getElementById('marketListContainer');
+      let html = '';
+
+      MARKETS_CONFIG.forEach(m => {
+        const isOpen = checkMarketStatus(m.openTime, m.lockTime);
+        const statusClass = isOpen ? 'status-open' : 'status-closed';
+        const statusText = isOpen ? 'OPEN FOR BET' : 'CLOSED / LOCKED';
+        const currentRate = liveRates[m.name] || 'Loading...';
+
+        html += `
+          <div class="market-row ${statusClass}" onclick="${isOpen ? `selectMarket('${m.name}')` : `alert('Market Closed')`}">
+            <div>
+              <strong>${m.name}</strong>
+              <small style="display:block; opacity:0.8;">Timing: ${m.openTime} - ${m.closeTime}</small>
+            </div>
+            <div style="text-align: right;">
+              <div class="live-rate-display">Rate: <span>${currentRate}</span></div>
+              <span class="status-badge">${statusText}</span>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function selectMarket(market) {
+      activeMarket = market;
+      document.getElementById('selectedMarketTitle').innerText = market + ' Prediction Panel';
+      document.getElementById('betSection').style.display = 'block';
+    }
+
+    function setMode(mode) {
+      activeMode = mode;
+      document.getElementById('currentMode').innerText = mode === 'single' ? 'Single Digit (1:8)' : 'Double Digit (1:80)';
+      document.getElementById('singleMode').classList.toggle('selected', mode === 'single');
+      document.getElementById('doubleMode').classList.toggle('selected', mode === 'double');
+    }
+
+    async function placeBet() {
+      const digit = document.getElementById('digitInput').value;
+      const coins = document.getElementById('coinInput').value;
+      if(!digit || !coins || activeMarket === '') return alert('Enter digit and coins.');
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/client/place-bet`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: userSession.id, market: activeMarket, type: activeMode, selectedDigit: digit, coins: Number(coins) })
+        });
+        const data = await res.json();
+        alert(data.msg);
+        if(res.ok) {
+          document.getElementById('bal').innerText = data.availableBalance;
+          document.getElementById('exp').innerText = data.exposure;
+        }
+      } catch (err) { alert('Backend connection failed.'); }
+    }
+
+    fetchLiveRates();
+    setInterval(fetchLiveRates, 3000);
+  </script>
+</body>
+</html>
