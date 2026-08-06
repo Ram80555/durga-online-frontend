@@ -11,24 +11,23 @@
       --card-bg: #151a21;
       --text-gold: #ffb400;
       --navy-btn: #122238;
-      --navy-btn-border: #1d3557;
       --body-bg: #090c10;
     }
     body { background-color: var(--body-bg); color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; }
     
     #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-    .login-card { background: #161b22; padding: 30px; border-radius: 8px; border: 1px solid #30363d; width: 90%; max-width: 360px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
-    .login-card h2 { color: var(--text-gold); margin-bottom: 20px; font-size: 24px; letter-spacing: 1px; }
+    .login-card { background: #161b22; padding: 30px; border-radius: 8px; border: 1px solid #30363d; width: 90%; max-width: 360px; text-align: center; }
+    .login-card h2 { color: var(--text-gold); margin-bottom: 20px; font-size: 24px; }
     .login-card input { width: 100%; padding: 12px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; box-sizing: border-box; }
     .login-card button { width: 100%; padding: 12px; background: var(--text-gold); border: none; font-weight: bold; color: #000; border-radius: 4px; cursor: pointer; margin-top: 10px; }
 
     .top-bar { background-color: var(--header-bg); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #21262d; }
-    .brand { font-size: 22px; font-weight: bold; color: var(--text-gold); display: flex; align-items: center; gap: 8px; }
+    .brand { font-size: 22px; font-weight: bold; color: var(--text-gold); }
     .nav-links { display: flex; gap: 20px; align-items: center; }
-    .nav-item { color: #8b949e; text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
+    .nav-item { color: #8b949e; font-size: 14px; font-weight: 600; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
     .nav-item:hover, .nav-item.active { color: #fff; background: #21262d; }
 
-    .ticker { background: #161b22; color: #e3b341; padding: 6px 15px; font-size: 12px; border-bottom: 1px solid #21262d; font-weight: 500; }
+    .ticker { background: #161b22; color: #e3b341; padding: 6px 15px; font-size: 12px; border-bottom: 1px solid #21262d; }
 
     .container { padding: 15px; max-width: 1100px; margin: 0 auto; }
     .tab-section { display: none; }
@@ -36,13 +35,10 @@
 
     .market-row { background: var(--card-bg); border: 1px solid #21262d; border-radius: 6px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     .market-name { font-size: 16px; font-weight: bold; color: #fff; }
-    .market-sub { font-size: 12px; color: #8b949e; }
     .market-rate { text-align: right; font-size: 18px; font-weight: bold; color: #fff; }
-    .rate-up { color: #3fb950; font-size: 13px; }
-    .rate-down { color: #f85149; font-size: 13px; }
 
-    .user-block { background: #f4f5f7; color: #000; border-radius: 6px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-    .user-block-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid #ddd; }
+    .user-block { background: #f4f5f7; color: #000; border-radius: 6px; padding: 12px; margin-bottom: 15px; }
+    .user-block-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid #ddd; }
     .user-badge { background: #d97706; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
     .metrics-row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 13px; font-weight: 600; text-align: center; }
     .metrics-col { flex: 1; }
@@ -98,55 +94,55 @@
       <div class="market-row">
         <div>
           <div class="market-name">🇰🇷 KOSPI</div>
-          <div class="market-sub">Korea Composite Index</div>
+          <div style="font-size:12px; color:#8b949e">Korea Composite Index</div>
         </div>
         <div class="market-rate">
           2,681.49
-          <div class="rate-down">-18.20 (-0.67%)</div>
+          <div style="color:#f85149; font-size:13px">-18.20 (-0.67%)</div>
         </div>
       </div>
 
       <div class="market-row">
         <div>
           <div class="market-name">🇭🇰 HANG SENG</div>
-          <div class="market-sub">Hong Kong</div>
+          <div style="font-size:12px; color:#8b949e">Hong Kong</div>
         </div>
         <div class="market-rate">
           18,813.45
-          <div class="rate-up">+196.92 (+1.06%)</div>
+          <div style="color:#3fb950; font-size:13px">+196.92 (+1.06%)</div>
         </div>
       </div>
 
       <div class="market-row">
         <div>
           <div class="market-name">🇮🇳 SENSEX</div>
-          <div class="market-sub">India</div>
+          <div style="font-size:12px; color:#8b949e">India</div>
         </div>
         <div class="market-rate">
           76,410.25
-          <div class="rate-up">+746.95 (+0.99%)</div>
+          <div style="color:#3fb950; font-size:13px">+746.95 (+0.99%)</div>
         </div>
       </div>
 
       <div class="market-row">
         <div>
           <div class="market-name">🇩🇪 DAX</div>
-          <div class="market-sub">Germany</div>
+          <div style="font-size:12px; color:#8b949e">Germany</div>
         </div>
         <div class="market-rate">
           18,638.56
-          <div class="rate-up">+199.18 (+1.08%)</div>
+          <div style="color:#3fb950; font-size:13px">+199.18 (+1.08%)</div>
         </div>
       </div>
 
       <div class="market-row">
         <div>
           <div class="market-name">🇺🇸 DOW JONES</div>
-          <div class="market-sub">United States</div>
+          <div style="font-size:12px; color:#8b949e">United States</div>
         </div>
         <div class="market-rate">
           38,798.99
-          <div class="rate-up">+222.86 (+0.58%)</div>
+          <div style="color:#3fb950; font-size:13px">+222.86 (+0.58%)</div>
         </div>
       </div>
     </div>
@@ -255,8 +251,6 @@
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/clients`);
-        if(!res.ok) throw new Error("Failed to fetch");
-        
         const data = await res.json();
         
         if (Array.isArray(data)) {
@@ -326,7 +320,7 @@
       renderClientsList(filtered);
     }
 
-    // MULTI-ENDPOINT DIRECT CREATION FIX
+    // EXACT ERROR DIAGNOSIS & CREATION FIX
     async function createClient() {
       const username = document.getElementById('newUsername').value.trim();
       const password = document.getElementById('newPassword').value.trim();
@@ -338,45 +332,39 @@
       btn.disabled = true;
       btn.innerText = 'CREATING...';
 
-      let success = false;
-      let errorMsg = '';
+      const endpoints = [
+        { url: `${BACKEND_URL}/api/admin/create-client`, body: { username, password, initialBalance: Number(coins) } },
+        { url: `${BACKEND_URL}/api/admin/create`, body: { username, password, balance: Number(coins) } },
+        { url: `${BACKEND_URL}/api/auth/register`, body: { username, password, role: 'client', balance: Number(coins) } },
+        { url: `${BACKEND_URL}/api/users/register`, body: { username, password, role: 'client' } }
+      ];
 
-      // Strategy 1: Try Admin Route
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/create-client`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, initialBalance: Number(coins) })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          success = true;
-        } else {
-          errorMsg = data.msg || data.message;
-        }
-      } catch (e) { }
+      let created = false;
+      let lastServerError = '';
 
-      // Strategy 2: Fallback to Auth Register Route
-      if (!success) {
+      for (let ep of endpoints) {
         try {
-          const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
+          const res = await fetch(ep.url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, role: 'client', balance: Number(coins) })
+            body: JSON.stringify(ep.body)
           });
           const data = await res.json();
           if (res.ok) {
-            success = true;
+            created = true;
+            break;
           } else {
-            errorMsg = data.msg || data.message || errorMsg;
+            lastServerError = data.msg || data.message || JSON.stringify(data);
           }
-        } catch (e) { }
+        } catch (e) {
+          lastServerError = e.message;
+        }
       }
 
       btn.disabled = false;
       btn.innerText = 'CREATE CLIENT';
 
-      if (success) {
+      if (created) {
         alert(`Client "${username}" Created Successfully!`);
         document.getElementById('newUsername').value = '';
         document.getElementById('newPassword').value = '';
@@ -384,7 +372,7 @@
         const navItem = document.querySelectorAll('.nav-item')[2];
         showTab('clientTab', navItem);
       } else {
-        alert(errorMsg || 'User already exists or Server Issue!');
+        alert(`Backend Detail: ${lastServerError}`);
       }
     }
 
