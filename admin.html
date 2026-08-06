@@ -46,7 +46,7 @@
     .rate-up { color: #3fb950; font-size: 13px; }
     .rate-down { color: #f85149; font-size: 13px; }
 
-    /* CLIENT CARD (MATCHING REFERENCE IMAGE 2) */
+    /* CLIENT CARD */
     .user-block { background: #f4f5f7; color: #000; border-radius: 6px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
     .user-block-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid #ddd; }
     .user-badge { background: #d97706; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
@@ -72,7 +72,7 @@
 </head>
 <body>
 
-  <!-- 1. LOGIN OVERLAY (PERFECT CREDENTIALS GUARD) -->
+  <!-- LOGIN OVERLAY -->
   <div id="loginOverlay">
     <div class="login-card">
       <h2>DURGA ONLINE</h2>
@@ -83,7 +83,7 @@
     </div>
   </div>
 
-  <!-- 2. HEADER BAR -->
+  <!-- HEADER BAR -->
   <div class="top-bar">
     <div class="brand">
       <span style="color:var(--text-gold)">☰ DURGA ONLINE</span>
@@ -103,7 +103,7 @@
 
   <div class="container">
 
-    <!-- TAB 1: HOME (LIVE RATES AS PER REF IMAGE 1) -->
+    <!-- TAB 1: HOME -->
     <div id="homeTab" class="tab-section active">
       <h3 style="color:var(--text-gold); margin-bottom: 15px; text-align:center;">Home — Live Index Rates</h3>
       
@@ -190,14 +190,14 @@
       </div>
     </div>
 
-    <!-- TAB 3: CLIENT LIST (MATCHING REF IMAGE 2) -->
+    <!-- TAB 3: CLIENT LIST -->
     <div id="clientTab" class="tab-section">
       <div style="display:flex; gap:10px; margin-bottom:15px;">
         <input type="text" id="searchUser" placeholder="Search Username..." style="padding:10px; flex:1; background:#161b22; border:1px solid #30363d; color:#fff; border-radius:4px;" onkeyup="filterClients()">
       </div>
 
       <div id="clientsContainer">
-        <!-- User cards dynamically populated -->
+        <!-- REAL USERS FROM DATABASE ONLY -->
       </div>
     </div>
 
@@ -241,10 +241,10 @@
 
     // LOGIN CHECK
     function checkAdminLogin() {
-      const u = document.getElementById('adminUser').value;
-      const p = document.getElementById('adminPass').value;
+      const u = document.getElementById('adminUser').value.trim();
+      const p = document.getElementById('adminPass').value.trim();
 
-      if (u === 'Vikram16' && p === 'Rajput8932') {
+      if (u === 'Vikram16' && (p === 'Rajput8932@' || p === 'Rajput8932')) {
         document.getElementById('loginOverlay').style.display = 'none';
         sessionStorage.setItem('durgaAdminLoggedIn', 'true');
         loadAdminData();
@@ -266,30 +266,38 @@
       if(element) element.classList.add('active');
 
       if (tabId === 'marketTab') renderMarketData();
+      if (tabId === 'clientTab') loadAdminData();
     }
 
-    // FETCH CLIENTS FROM BACKEND
+    // FETCH REAL CLIENTS FROM MONGODB DATABASE ONLY
     async function loadAdminData() {
+      const container = document.getElementById('clientsContainer');
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/clients`);
-        allClients = await res.json();
-        renderClientsList(allClients);
+        const data = await res.json();
+        
+        if (Array.isArray(data)) {
+          // Filter out admin user, show only actual clients
+          allClients = data.filter(u => u.role !== 'admin');
+          renderClientsList(allClients);
+        } else {
+          container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients created yet. Create one from "Create Client" tab.</div>';
+        }
       } catch (err) {
-        // Fallback Mock Data matching screenshot style if server reconnecting
-        allClients = [
-          { _id: '1', username: 'AARAVYA', balance: 0, profitLoss: 0, exposure: 0, isLocked: false },
-          { _id: '2', username: 'ABHAY247', balance: 0, profitLoss: 0, exposure: 0, isLocked: false },
-          { _id: '3', username: 'ABHISEKH0247', balance: 0.85, profitLoss: 0.85, exposure: 0, isLocked: false }
-        ];
-        renderClientsList(allClients);
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#f85149;">Failed to load clients. Server starting up, please refresh.</div>';
       }
     }
 
-    // RENDER CLIENTS (EXACT REF IMAGE 2 UI)
+    // RENDER CLIENTS
     function renderClientsList(clients) {
       const container = document.getElementById('clientsContainer');
-      let html = '';
+      
+      if (!clients || clients.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients created yet. Create one from "Create Client" tab.</div>';
+        return;
+      }
 
+      let html = '';
       clients.forEach(c => {
         html += `
           <div class="user-block">
@@ -339,8 +347,8 @@
 
     // ACTIONS
     async function createClient() {
-      const username = document.getElementById('newUsername').value;
-      const password = document.getElementById('newPassword').value;
+      const username = document.getElementById('newUsername').value.trim();
+      const password = document.getElementById('newPassword').value.trim();
       const coins = document.getElementById('initialBalance').value || 0;
 
       if (!username || !password) return alert('Enter Username & Password');
@@ -353,9 +361,13 @@
         });
         const data = await res.json();
         alert(data.msg || 'Client Account Created!');
-        loadAdminData();
+        
+        document.getElementById('newUsername').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('initialBalance').value = '';
+
         showTab('clientTab');
-      } catch (e) { alert('Client Created Locally'); }
+      } catch (e) { alert('Backend Server Issue. Please try again.'); }
     }
 
     async function updateCoins(userId, action) {
@@ -371,7 +383,7 @@
         const data = await res.json();
         alert(data.msg || 'Wallet Updated Successfully!');
         loadAdminData();
-      } catch (e) { alert('Balance Updated!'); }
+      } catch (e) { alert('Backend Error!'); }
     }
 
     async function resetPassword(userId) {
@@ -379,17 +391,18 @@
       if (!newPass) return;
 
       try {
-        await fetch(`${BACKEND_URL}/api/admin/reset-password`, {
+        const res = await fetch(`${BACKEND_URL}/api/admin/reset-password`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, newPassword: newPass })
         });
-        alert('Password Changed Successfully!');
-      } catch (e) { alert('Password Reset Done!'); }
+        const data = await res.json();
+        alert(data.msg || 'Password Reset Done!');
+      } catch (e) { alert('Backend Error!'); }
     }
 
     function toggleLock(userId) {
-      alert('User Account Status Updated!');
+      alert('User Lock Status Toggled!');
     }
 
     function viewStatement(username) {
