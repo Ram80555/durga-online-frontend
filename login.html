@@ -6,7 +6,7 @@
   <title>Durga Online - Login</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #121212; font-family: sans-serif; }
+    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #121212; font-family: sans-serif; margin: 0; }
     .login-card { width: 100%; max-width: 380px; padding: 25px; background: #1e1e1e; border-radius: 8px; border: 1px solid #333; color: white; box-sizing: border-box; }
     input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
     .btn-submit { width: 100%; padding: 12px; background: #28a745; border: none; font-weight: bold; color: white; border-radius: 4px; cursor: pointer; margin-top: 15px; }
@@ -28,13 +28,30 @@
       const password = document.getElementById('loginPass').value.trim();
       if (!username || !password) return alert('Enter credentials');
 
-      // Admin Login Route Check
+      // 1. ADMIN DIRECT OVERRIDE
       if (username === 'Vikram16' && (password === 'Rajput8932@' || password === 'Rajput8932')) {
         sessionStorage.setItem('durgaAdminLoggedIn', 'true');
         window.location.href = 'admin.html';
         return;
       }
 
+      // 2. LOCAL CLIENTS CHECK (Instant Login for Admin Created Users)
+      const localClients = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
+      const matchedUser = localClients.find(c => c.username.toLowerCase() === username.toLowerCase() && c.password === password);
+
+      if (matchedUser) {
+        if (matchedUser.isLocked) return alert('Your account is LOCKED by Admin.');
+        localStorage.setItem('durgaUser', JSON.stringify({
+          _id: matchedUser.username,
+          username: matchedUser.username,
+          role: 'client',
+          balance: matchedUser.balance || 0
+        }));
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // 3. SERVER DATABASE CHECK (FALLBACK)
       try {
         const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
           method: 'POST',
@@ -52,11 +69,10 @@
             window.location.href = 'index.html';
           }
         } else {
-          // If message is missing in backend response
           alert(data.msg || data.message || 'Invalid Username or Password!');
         }
       } catch (err) { 
-        alert('Backend Server Not Reachable. Please try again in 10 seconds.'); 
+        alert('Invalid Username or Password!'); 
       }
     }
   </script>
