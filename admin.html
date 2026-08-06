@@ -16,29 +16,24 @@
     }
     body { background-color: var(--body-bg); color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; }
     
-    /* LOGIN OVERLAY */
     #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
     .login-card { background: #161b22; padding: 30px; border-radius: 8px; border: 1px solid #30363d; width: 90%; max-width: 360px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
     .login-card h2 { color: var(--text-gold); margin-bottom: 20px; font-size: 24px; letter-spacing: 1px; }
     .login-card input { width: 100%; padding: 12px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; box-sizing: border-box; }
     .login-card button { width: 100%; padding: 12px; background: var(--text-gold); border: none; font-weight: bold; color: #000; border-radius: 4px; cursor: pointer; margin-top: 10px; }
 
-    /* HEADER BAR */
     .top-bar { background-color: var(--header-bg); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #21262d; }
     .brand { font-size: 22px; font-weight: bold; color: var(--text-gold); display: flex; align-items: center; gap: 8px; }
     .nav-links { display: flex; gap: 20px; align-items: center; }
     .nav-item { color: #8b949e; text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
     .nav-item:hover, .nav-item.active { color: #fff; background: #21262d; }
 
-    /* TICKER MARQUEE */
     .ticker { background: #161b22; color: #e3b341; padding: 6px 15px; font-size: 12px; border-bottom: 1px solid #21262d; font-weight: 500; }
 
-    /* CONTAINER & CARDS */
     .container { padding: 15px; max-width: 1100px; margin: 0 auto; }
     .tab-section { display: none; }
     .tab-section.active { display: block; }
 
-    /* HOME LIVE RATES TABLE */
     .market-row { background: var(--card-bg); border: 1px solid #21262d; border-radius: 6px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     .market-name { font-size: 16px; font-weight: bold; color: #fff; }
     .market-sub { font-size: 12px; color: #8b949e; }
@@ -46,25 +41,21 @@
     .rate-up { color: #3fb950; font-size: 13px; }
     .rate-down { color: #f85149; font-size: 13px; }
 
-    /* CLIENT CARD */
     .user-block { background: #f4f5f7; color: #000; border-radius: 6px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
     .user-block-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid #ddd; }
     .user-badge { background: #d97706; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
     .metrics-row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 13px; font-weight: 600; text-align: center; }
     .metrics-col { flex: 1; }
     
-    /* ACTION BUTTONS GRID */
     .btn-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .action-btn { background: #1e293b; color: #fff; border: 1px solid #334155; padding: 8px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; flex: 1 1 30%; text-align: center; text-transform: uppercase; }
     .action-btn:hover { background: #334155; }
     .btn-cr { background: #0284c7; color: white; flex: 0 0 auto; width: 35px; }
 
-    /* FORM STYLES */
     .form-box { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid #21262d; margin-bottom: 15px; }
     .form-box input { width: 100%; padding: 10px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; box-sizing: border-box; }
     .btn-submit { background: #238636; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
     
-    /* MARKET EXPOSURE TABLE */
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #30363d; padding: 8px 12px; text-align: center; font-size: 13px; }
     th { background: #161b22; color: var(--text-gold); }
@@ -72,7 +63,6 @@
 </head>
 <body>
 
-  <!-- LOGIN OVERLAY -->
   <div id="loginOverlay">
     <div class="login-card">
       <h2>DURGA ONLINE</h2>
@@ -83,7 +73,6 @@
     </div>
   </div>
 
-  <!-- HEADER BAR -->
   <div class="top-bar">
     <div class="brand">
       <span style="color:var(--text-gold)">☰ DURGA ONLINE</span>
@@ -103,7 +92,6 @@
 
   <div class="container">
 
-    <!-- TAB 1: HOME -->
     <div id="homeTab" class="tab-section active">
       <h3 style="color:var(--text-gold); margin-bottom: 15px; text-align:center;">Home — Live Index Rates</h3>
       
@@ -163,7 +151,6 @@
       </div>
     </div>
 
-    <!-- TAB 2: MARKET EXPOSURE -->
     <div id="marketTab" class="tab-section">
       <h3 style="color:var(--text-gold); margin-bottom: 15px;">Market Total Predictions & Coins</h3>
       <div class="form-box">
@@ -184,24 +171,20 @@
             <tr><th>Digit</th><th>Total Coins Bet</th></tr>
           </thead>
           <tbody id="singleDigitBody">
-            <!-- Dynamic Data -->
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- TAB 3: CLIENT LIST -->
     <div id="clientTab" class="tab-section">
       <div style="display:flex; gap:10px; margin-bottom:15px;">
         <input type="text" id="searchUser" placeholder="Search Username..." style="padding:10px; flex:1; background:#161b22; border:1px solid #30363d; color:#fff; border-radius:4px;" onkeyup="filterClients()">
       </div>
 
       <div id="clientsContainer">
-        <!-- REAL USERS FROM DATABASE ONLY -->
       </div>
     </div>
 
-    <!-- TAB 4: CREATE CLIENT -->
     <div id="createTab" class="tab-section">
       <div class="form-box" style="max-width: 500px; margin: 0 auto;">
         <h3 style="color:var(--text-gold); margin-bottom: 15px;">Create New Client Account</h3>
@@ -212,7 +195,6 @@
       </div>
     </div>
 
-    <!-- TAB 5: PLATFORM STATEMENT -->
     <div id="statementTab" class="tab-section">
       <div class="form-box">
         <h3 style="color:var(--text-gold); margin-bottom: 15px;">Global Financial Statements</h3>
@@ -239,7 +221,6 @@
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
     let allClients = [];
 
-    // LOGIN CHECK
     function checkAdminLogin() {
       const u = document.getElementById('adminUser').value.trim();
       const p = document.getElementById('adminPass').value.trim();
@@ -258,7 +239,6 @@
       window.onload = loadAdminData;
     }
 
-    // TAB NAVIGATION
     function showTab(tabId, element) {
       document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -269,7 +249,6 @@
       if (tabId === 'clientTab') loadAdminData();
     }
 
-    // FETCH REAL CLIENTS FROM MONGODB DATABASE
     async function loadAdminData() {
       const container = document.getElementById('clientsContainer');
       container.innerHTML = '<div style="text-align:center; padding:20px; color:#ffb400;">Loading Clients...</div>';
@@ -291,7 +270,6 @@
       }
     }
 
-    // RENDER CLIENTS
     function renderClientsList(clients) {
       const container = document.getElementById('clientsContainer');
       
@@ -348,7 +326,7 @@
       renderClientsList(filtered);
     }
 
-    // REAL CLIENT CREATION WITH VERIFICATION
+    // MULTI-ENDPOINT DIRECT CREATION FIX
     async function createClient() {
       const username = document.getElementById('newUsername').value.trim();
       const password = document.getElementById('newPassword').value.trim();
@@ -360,32 +338,53 @@
       btn.disabled = true;
       btn.innerText = 'CREATING...';
 
+      let success = false;
+      let errorMsg = '';
+
+      // Strategy 1: Try Admin Route
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/create-client`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password, initialBalance: Number(coins) })
         });
-
         const data = await res.json();
-
         if (res.ok) {
-          alert(data.msg || `Client "${username}" Created Successfully!`);
-          document.getElementById('newUsername').value = '';
-          document.getElementById('newPassword').value = '';
-          document.getElementById('initialBalance').value = '';
-
-          // Switch to Client List tab & Reload Live List
-          const navItem = document.querySelectorAll('.nav-item')[2];
-          showTab('clientTab', navItem);
+          success = true;
         } else {
-          alert(data.msg || 'User already exists or backend error.');
+          errorMsg = data.msg || data.message;
         }
-      } catch (e) {
-        alert('Backend connection error. Please wait 10s and try again.');
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'CREATE CLIENT';
+      } catch (e) { }
+
+      // Strategy 2: Fallback to Auth Register Route
+      if (!success) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, role: 'client', balance: Number(coins) })
+          });
+          const data = await res.json();
+          if (res.ok) {
+            success = true;
+          } else {
+            errorMsg = data.msg || data.message || errorMsg;
+          }
+        } catch (e) { }
+      }
+
+      btn.disabled = false;
+      btn.innerText = 'CREATE CLIENT';
+
+      if (success) {
+        alert(`Client "${username}" Created Successfully!`);
+        document.getElementById('newUsername').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('initialBalance').value = '';
+        const navItem = document.querySelectorAll('.nav-item')[2];
+        showTab('clientTab', navItem);
+      } else {
+        alert(errorMsg || 'User already exists or Server Issue!');
       }
     }
 
