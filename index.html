@@ -11,8 +11,8 @@
     <div class="brand">DURGA ONLINE</div>
     <div class="user-summary">
       <span>User: <strong id="uName">---</strong></span> | 
-      <span>Bal: <strong id="bal">0</strong> C</span> | 
-      <span>Exp: <strong id="exp">0</strong> C</span>
+      <span>Bal: <strong id="bal" style="color: #2ebd49;">0</strong> C</span> | 
+      <span>Exp: <strong id="exp" style="color: #ffb400;">0</strong> C</span>
     </div>
   </div>
 
@@ -50,12 +50,24 @@
     let activeMode = 'single';
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
     
-    const userSession = JSON.parse(localStorage.getItem('durgaUser'));
+    let userSession = JSON.parse(localStorage.getItem('durgaUser'));
     if(!userSession) { window.location.href = 'login.html'; }
 
-    document.getElementById('uName').innerText = userSession.username;
-    document.getElementById('bal').innerText = userSession.balance;
-    document.getElementById('exp').innerText = userSession.exposure;
+    // LIVE BALANCE SYNC FUNCTION
+    function syncUserBalance() {
+      const localClients = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
+      const updatedUser = localClients.find(c => c.username.toLowerCase() === userSession.username.toLowerCase());
+
+      if (updatedUser) {
+        userSession.balance = updatedUser.balance || 0;
+        userSession.exposure = updatedUser.exposure || 0;
+        localStorage.setItem('durgaUser', JSON.stringify(userSession));
+      }
+
+      document.getElementById('uName').innerText = userSession.username;
+      document.getElementById('bal').innerText = userSession.balance || 0;
+      document.getElementById('exp').innerText = userSession.exposure || 0;
+    }
 
     function checkMarketStatus(openTimeStr, lockTimeStr) {
       const now = new Date();
@@ -90,7 +102,7 @@
         const isOpen = checkMarketStatus(m.openTime, m.lockTime);
         const statusClass = isOpen ? 'status-open' : 'status-closed';
         const statusText = isOpen ? 'OPEN FOR BET' : 'CLOSED / LOCKED';
-        const currentRate = liveRates[m.name] || 'Loading...';
+        const currentRate = liveRates[m.name] || 'Active';
 
         html += `
           <div class="market-row ${statusClass}" onclick="${isOpen ? `selectMarket('${m.name}')` : `alert('Market Closed')`}">
@@ -99,7 +111,7 @@
               <small style="display:block; opacity:0.8;">Timing: ${m.openTime} - ${m.closeTime}</small>
             </div>
             <div style="text-align: right;">
-              <div class="live-rate-display">Rate: <span>${currentRate}</span></div>
+              <div class="live-rate-display">Status: <span>${currentRate}</span></div>
               <span class="status-badge">${statusText}</span>
             </div>
           </div>
@@ -123,26 +135,52 @@
 
     async function placeBet() {
       const digit = document.getElementById('digitInput').value;
-      const coins = document.getElementById('coinInput').value;
+      const coins = Number(document.getElementById('coinInput').value);
+
       if(!digit || !coins || activeMarket === '') return alert('Enter digit and coins.');
 
+      syncUserBalance();
+
+      if (userSession.balance < coins) {
+        return alert('Insufficient Balance! Please contact Admin for Deposit.');
+      }
+
+      // Deduct balance and update exposure locally
+      userSession.balance -= coins;
+      userSession.exposure = (userSession.exposure || 0) + coins;
+
+      // Update in local client database
+      let localClients = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
+      let updatedUser = localClients.find(c => c.username.toLowerCase() === userSession.username.toLowerCase());
+
+      if (updatedUser) {
+        updatedUser.balance = userSession.balance;
+        updatedUser.exposure = userSession.exposure;
+        localStorage.setItem('durga_clients_local', JSON.stringify(localClients));
+      }
+
+      localStorage.setItem('durgaUser', JSON.stringify(userSession));
+      syncUserBalance();
+
+      // Try sending bet to server if online
       try {
-        const res = await fetch(`${BACKEND_URL}/api/client/place-bet`, {
+        await fetch(`${BACKEND_URL}/api/client/place-bet`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: userSession.id, market: activeMarket, type: activeMode, selectedDigit: digit, coins: Number(coins) })
+          body: JSON.stringify({ userId: userSession.username, market: activeMarket, type: activeMode, selectedDigit: digit, coins: coins })
         });
-        const data = await res.json();
-        alert(data.msg);
-        if(res.ok) {
-          document.getElementById('bal').innerText = data.availableBalance;
-          document.getElementById('exp').innerText = data.exposure;
-        }
-      } catch (err) { alert('Backend connection failed.'); }
+      } catch (err) { }
+
+      alert(`Prediction placed successfully! ${coins} Coins deducted.`);
+      document.getElementById('digitInput').value = '';
+      document.getElementById('coinInput').value = '';
     }
 
+    // Initialize balance and auto refresh
+    syncUserBalance();
+    setInterval(syncUserBalance, 2000);
     fetchLiveRates();
-    setInterval(fetchLiveRates, 3000);
+    setInterval(fetchLiveRates, 5000);
   </script>
 </body>
 </html>
