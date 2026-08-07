@@ -71,7 +71,7 @@
       <span><strong id="uName">---</strong></span> | 
       <span style="color:#2ebd49;">Bal: <strong id="bal">0</strong> C</span> | 
       <span style="color:#ffb400;">Exp: <strong id="exp">0</strong> C</span>
-      <button class="btn-bets" onclick="openPendingBets()">Bet Placed</button>
+      <button class="btn-bets" onclick="openPendingBets()">Placed Bets</button>
       <button class="btn-nav" onclick="openStatement()">Statement</button>
       <button class="btn-logout" onclick="clientLogout()">Logout</button>
     </div>
@@ -207,7 +207,7 @@
                 <div class="res-box"><small>Single</small>${r.singleDigit}</div>
                 <div class="res-box"><small>Double</small>${r.doubleDigit}</div>
               </div>
-              <div class="res-timer" id="timer-${m.name.replace(/\s+/g, '')}">Settle in --:--:--</div>
+              <div class="res-timer" id="timer-${m.name.replace(/\s+/g, '')}">Next Result in --:--:--</div>
             </div>
           `;
         });
