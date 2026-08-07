@@ -30,7 +30,6 @@
 
       if (!username || !password) return alert('Enter credentials');
 
-      // 1. ADMIN HARDCODED ACCESS
       if (username === 'Vikram16' && (password === 'Rajput8932@' || password === 'Rajput8932')) {
         sessionStorage.setItem('durgaAdminLoggedIn', 'true');
         window.location.href = 'admin.html';
@@ -40,7 +39,6 @@
       btn.disabled = true;
       btn.innerText = 'LOGGING IN...';
 
-      // 2. MONGODB DATABASE SERVER CHECK
       try {
         const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
           method: 'POST',
@@ -61,7 +59,7 @@
           alert(data.msg || data.message || 'Invalid Username or Password!');
         }
       } catch (err) { 
-        alert('Server not responding. Please wait 10 seconds for backend server to wake up.'); 
+        alert('Server not responding. Please try again.'); 
       } finally {
         btn.disabled = false;
         btn.innerText = 'LOGIN';
