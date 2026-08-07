@@ -268,22 +268,24 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             username: userSession.username,
+            userId: userSession._id || userSession.username,
             market: activeMarket,
             type: activeMode,
             selectedDigit: digit,
             coins: coins
           })
         });
+        
         const data = await res.json();
         if(res.ok) {
-          alert(`Prediction Placed Successfully!`);
+          alert(`Prediction Placed Successfully! ${coins} Coins deducted.`);
           document.getElementById('digitInput').value = '';
           document.getElementById('coinInput').value = '';
           verifyDeviceSession();
         } else {
-          alert(data.msg || 'Error placing bet');
+          alert(data.msg || data.message || 'Error placing bet');
         }
-      } catch (err) { alert('Server error!'); }
+      } catch (err) { alert('Server response error. Please try again.'); }
       finally {
         btn.disabled = false;
         btn.innerText = 'PLACE PREDICTION';
