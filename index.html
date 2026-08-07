@@ -32,7 +32,7 @@
         <p style="font-size: 14px; margin-bottom: 5px;">Mode Selected: <strong id="currentMode" style="color: #ffb400;">Single Digit (1:8)</strong></p>
         <input type="text" id="digitInput" placeholder="Enter Digit (0-9 or 00-99)">
         <input type="number" id="coinInput" placeholder="Enter Amount of Coins">
-        <button class="btn btn-submit" onclick="placeBet()">PLACE PREDICTION</button>
+        <button class="btn btn-submit" id="betBtn" onclick="placeBet()">PLACE PREDICTION</button>
       </div>
     </div>
   </div>
@@ -53,16 +53,17 @@
     let userSession = JSON.parse(localStorage.getItem('durgaUser'));
     if(!userSession) { window.location.href = 'login.html'; }
 
-    // LIVE BALANCE SYNC FUNCTION
-    function syncUserBalance() {
-      const localClients = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
-      const updatedUser = localClients.find(c => c.username.toLowerCase() === userSession.username.toLowerCase());
-
-      if (updatedUser) {
-        userSession.balance = updatedUser.balance || 0;
-        userSession.exposure = updatedUser.exposure || 0;
-        localStorage.setItem('durgaUser', JSON.stringify(userSession));
-      }
+    // REALTIME DATABASE BALANCE SYNC
+    async function syncUserBalance() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/client/user-info/${userSession._id || userSession.username}`);
+        if(res.ok) {
+          const data = await res.json();
+          userSession.balance = data.balance || 0;
+          userSession.exposure = data.exposure || 0;
+          localStorage.setItem('durgaUser', JSON.stringify(userSession));
+        }
+      } catch (err) { }
 
       document.getElementById('uName').innerText = userSession.username;
       document.getElementById('bal').innerText = userSession.balance || 0;
@@ -136,49 +137,43 @@
     async function placeBet() {
       const digit = document.getElementById('digitInput').value;
       const coins = Number(document.getElementById('coinInput').value);
+      const btn = document.getElementById('betBtn');
 
       if(!digit || !coins || activeMarket === '') return alert('Enter digit and coins.');
-
-      syncUserBalance();
 
       if (userSession.balance < coins) {
         return alert('Insufficient Balance! Please contact Admin for Deposit.');
       }
 
-      // Deduct balance and update exposure locally
-      userSession.balance -= coins;
-      userSession.exposure = (userSession.exposure || 0) + coins;
+      btn.disabled = true;
+      btn.innerText = 'PLACING PREDICTION...';
 
-      // Update in local client database
-      let localClients = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
-      let updatedUser = localClients.find(c => c.username.toLowerCase() === userSession.username.toLowerCase());
-
-      if (updatedUser) {
-        updatedUser.balance = userSession.balance;
-        updatedUser.exposure = userSession.exposure;
-        localStorage.setItem('durga_clients_local', JSON.stringify(localClients));
-      }
-
-      localStorage.setItem('durgaUser', JSON.stringify(userSession));
-      syncUserBalance();
-
-      // Try sending bet to server if online
       try {
-        await fetch(`${BACKEND_URL}/api/client/place-bet`, {
+        const res = await fetch(`${BACKEND_URL}/api/client/place-bet`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: userSession.username, market: activeMarket, type: activeMode, selectedDigit: digit, coins: coins })
+          body: JSON.stringify({ userId: userSession._id || userSession.username, market: activeMarket, type: activeMode, selectedDigit: digit, coins: coins })
         });
-      } catch (err) { }
-
-      alert(`Prediction placed successfully! ${coins} Coins deducted.`);
-      document.getElementById('digitInput').value = '';
-      document.getElementById('coinInput').value = '';
+        const data = await res.json();
+        
+        if(res.ok) {
+          alert(`Prediction placed successfully! ${coins} Coins deducted.`);
+          document.getElementById('digitInput').value = '';
+          document.getElementById('coinInput').value = '';
+          syncUserBalance();
+        } else {
+          alert(data.msg || 'Error placing prediction');
+        }
+      } catch (err) {
+        alert('Server connection issue!');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'PLACE PREDICTION';
+      }
     }
 
-    // Initialize balance and auto refresh
     syncUserBalance();
-    setInterval(syncUserBalance, 2000);
+    setInterval(syncUserBalance, 3000);
     fetchLiveRates();
     setInterval(fetchLiveRates, 5000);
   </script>
