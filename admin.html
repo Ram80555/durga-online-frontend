@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DURGA ONLINE - ADMIN PANEL</title>
+  <title>DURGA ONLINE - GLOBAL ADMIN PANEL</title>
   <link rel="stylesheet" href="style.css">
   <style>
     :root {
@@ -22,9 +22,11 @@
 
     .top-bar { background-color: var(--header-bg); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #21262d; }
     .brand { font-size: 22px; font-weight: bold; color: var(--text-gold); }
-    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links { display: flex; gap: 12px; align-items: center; }
     .nav-item { color: #8b949e; font-size: 14px; font-weight: 600; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
     .nav-item:hover, .nav-item.active { color: #fff; background: #21262d; }
+    .btn-logout { background: #da3633; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-left: 10px; }
+    .btn-logout:hover { background: #b91c1c; }
 
     .ticker { background: #161b22; color: #e3b341; padding: 6px 15px; font-size: 12px; border-bottom: 1px solid #21262d; }
 
@@ -52,8 +54,12 @@
     .btn-submit { background: #238636; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
     
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #30363d; padding: 8px 12px; text-align: center; font-size: 13px; }
+    th, td { border: 1px solid #30363d; padding: 10px; text-align: center; font-size: 13px; }
     th { background: #161b22; color: var(--text-gold); }
+    .badge-type { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
+    .badge-green { background: #1b4721; color: #4ade80; }
+    .badge-red { background: #451a1a; color: #f87171; }
+    .badge-orange { background: #452a1a; color: #fb923c; }
   </style>
 </head>
 <body>
@@ -78,6 +84,7 @@
       <span class="nav-item" onclick="showTab('clientTab', this)">Client List</span>
       <span class="nav-item" onclick="showTab('createTab', this)">Create Client</span>
       <span class="nav-item" onclick="showTab('statementTab', this)">Statement</span>
+      <button class="btn-logout" onclick="adminLogout()">LOGOUT</button>
     </div>
   </div>
 
@@ -88,7 +95,7 @@
   <div class="container">
 
     <div id="homeTab" class="tab-section active">
-      <h3 style="color:var(--text-gold); margin-bottom: 15px; text-align:center;">Home2 — Live Index Rates</h3>
+      <h3 style="color:var(--text-gold); margin-bottom: 15px; text-align:center;">Home — Live Index Rates</h3>
       
       <div class="market-row">
         <div>
@@ -190,21 +197,25 @@
       </div>
     </div>
 
+    <!-- STATEMENT TAB -->
     <div id="statementTab" class="tab-section">
       <div class="form-box">
-        <h3 style="color:var(--text-gold); margin-bottom: 15px;">Global Financial Statements</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+          <h3 style="color:var(--text-gold); margin:0;">Global Activity & Financial Statements</h3>
+          <button onclick="loadStatements()" style="background:#21262d; color:#fff; border:1px solid #30363d; padding:6px 12px; border-radius:4px; cursor:pointer;">Refresh Statements</button>
+        </div>
         <table>
           <thead>
             <tr>
-              <th>Date / Time</th>
+              <th>Date & Time</th>
               <th>Username</th>
-              <th>Type</th>
+              <th>Activity Type</th>
               <th>Coins</th>
               <th>Remark</th>
             </tr>
           </thead>
           <tbody id="statementTableBody">
-            <tr><td colspan="5">No recent transactions recorded.</td></tr>
+            <tr><td colspan="5">Loading Statements...</td></tr>
           </tbody>
         </table>
       </div>
@@ -234,6 +245,13 @@
       window.onload = loadAdminData;
     }
 
+    function adminLogout() {
+      if(confirm('Are you sure you want to Logout Admin Panel?')) {
+        sessionStorage.removeItem('durgaAdminLoggedIn');
+        window.location.href = 'login.html';
+      }
+    }
+
     function showTab(tabId, element) {
       document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -242,43 +260,29 @@
 
       if (tabId === 'marketTab') renderMarketData();
       if (tabId === 'clientTab') loadAdminData();
+      if (tabId === 'statementTab') loadStatements();
     }
 
     async function loadAdminData() {
       const container = document.getElementById('clientsContainer');
       container.innerHTML = '<div style="text-align:center; padding:20px; color:#ffb400;">Fetching database clients...</div>';
 
-      const endpoints = [
-        `${BACKEND_URL}/api/admin/clients`,
-        `${BACKEND_URL}/api/users`,
-        `${BACKEND_URL}/api/clients`
-      ];
-
-      let fetched = false;
-      for (let url of endpoints) {
-        try {
-          const res = await fetch(url);
-          if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data)) {
-              allClients = data.filter(u => u.role !== 'admin');
-              renderClientsList(allClients);
-              fetched = true;
-              break;
-            }
-          }
-        } catch(e) {}
-      }
-
-      if(!fetched) {
-        const localData = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
-        renderClientsList(localData);
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/clients`);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          allClients = data.filter(u => u.role !== 'admin');
+          renderClientsList(allClients);
+        } else {
+          container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients found in MongoDB.</div>';
+        }
+      } catch (err) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#f85149;">Server connecting... Refresh in 5s.</div>';
       }
     }
 
     function renderClientsList(clients) {
       const container = document.getElementById('clientsContainer');
-      
       if (!clients || clients.length === 0) {
         container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients created yet.</div>';
         return;
@@ -291,7 +295,7 @@
             <div class="user-block-header">
               <div><span class="user-badge">C</span> ${c.username}</div>
               <div style="font-size: 16px;">
-                ${c.isLocked ? '🔒' : '🔓'} 🔓
+                ${c.isLocked ? '🔒 LOCKED' : '🔓 ACTIVE'}
               </div>
             </div>
             
@@ -312,17 +316,15 @@
 
             <div class="btn-grid">
               <button class="action-btn btn-cr">CR</button>
-              <button class="action-btn" onclick="updateCoins('${c._id || c.username}', 'add')">BANK DEPOSIT</button>
-              <button class="action-btn" onclick="updateCoins('${c._id || c.username}', 'withdraw')">BANK WITHDRAW</button>
+              <button class="action-btn" onclick="updateCoins('${c._id}', 'add')">BANK DEPOSIT</button>
+              <button class="action-btn" onclick="updateCoins('${c._id}', 'withdraw')">BANK WITHDRAW</button>
               <button class="action-btn" onclick="viewStatement('${c.username}')">ACCOUNT STATEMENT</button>
               <button class="action-btn" onclick="alert('No pending bets')">PENDING BETS</button>
-              <button class="action-btn" onclick="resetPassword('${c._id || c.username}')">RESET PASSWORD</button>
-              <button class="action-btn" onclick="toggleLock('${c._id || c.username}')">${c.isLocked ? 'UNLOCK' : 'LOCK'} ACCOUNT</button>
+              <button class="action-btn" onclick="toggleLock('${c._id}')">${c.isLocked ? 'UNLOCK' : 'LOCK'} ACCOUNT</button>
             </div>
           </div>
         `;
       });
-
       container.innerHTML = html;
     }
 
@@ -332,7 +334,6 @@
       renderClientsList(filtered);
     }
 
-    // CREATE CLIENT WITH REALTIME BACKEND DIAGNOSIS & LOCAL FALLBACK
     async function createClient() {
       const username = document.getElementById('newUsername').value.trim();
       const password = document.getElementById('newPassword').value.trim();
@@ -344,93 +345,99 @@
       btn.disabled = true;
       btn.innerText = 'SAVING CLIENT...';
 
-      let isCreated = false;
-      let rawServerMsg = '';
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/create-client`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, initialBalance: Number(coins) })
+        });
+        const data = await res.json();
 
-      const routes = [
-        { url: `${BACKEND_URL}/api/admin/create-client`, body: { username, password, initialBalance: Number(coins) } },
-        { url: `${BACKEND_URL}/api/users/register`, body: { username, password, role: 'client', balance: Number(coins) } },
-        { url: `${BACKEND_URL}/api/auth/register`, body: { username, password, role: 'client', balance: Number(coins) } }
-      ];
-
-      for (let r of routes) {
-        try {
-          const res = await fetch(r.url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(r.body)
-          });
-          const text = await res.text();
-          let data = {};
-          try { data = JSON.parse(text); } catch(e){}
-
-          if (res.ok) {
-            isCreated = true;
-            break;
-          } else {
-            rawServerMsg = data.msg || data.message || text;
-          }
-        } catch (e) { rawServerMsg = e.message; }
+        if (res.ok) {
+          alert(data.msg || `Client "${username}" Created Successfully!`);
+          document.getElementById('newUsername').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('initialBalance').value = '';
+          const navItem = document.querySelectorAll('.nav-item')[2];
+          showTab('clientTab', navItem);
+        } else {
+          alert(data.msg || 'User creation failed');
+        }
+      } catch (e) {
+        alert('Server connection error!');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'CREATE CLIENT';
       }
-
-      // Local storage fallback so client creation NEVER blocks
-      let localData = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
-      localData = localData.filter(c => c.username !== username);
-      localData.push({ username, password, balance: Number(coins), profitLoss: 0, exposure: 0, isLocked: false });
-      localStorage.setItem('durga_clients_local', JSON.stringify(localData));
-
-      btn.disabled = false;
-      btn.innerText = 'CREATE CLIENT';
-
-      if (isCreated) {
-        alert(`Client "${username}" Created Successfully in Cloud DB!`);
-      } else {
-        alert(`Client "${username}" Created! (Backend Note: ${rawServerMsg.slice(0, 80)})`);
-      }
-
-      document.getElementById('newUsername').value = '';
-      document.getElementById('newPassword').value = '';
-      document.getElementById('initialBalance').value = '';
-      const navItem = document.querySelectorAll('.nav-item')[2];
-      showTab('clientTab', navItem);
     }
 
     async function updateCoins(userId, action) {
       const coins = prompt(`Enter coins to ${action}:`);
       if (!coins || isNaN(coins)) return;
 
-      let localData = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
-      let user = localData.find(c => c.username === userId || c._id === userId);
-      if(user) {
-        if(action === 'add') user.balance += Number(coins);
-        if(action === 'withdraw') user.balance -= Number(coins);
-        localStorage.setItem('durga_clients_local', JSON.stringify(localData));
-      }
-
       try {
-        await fetch(`${BACKEND_URL}/api/admin/update-coins`, {
+        const res = await fetch(`${BACKEND_URL}/api/admin/update-coins`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, coins: Number(coins), action })
         });
-      } catch (e) {}
-
-      alert('Wallet Updated Successfully!');
-      loadAdminData();
+        const data = await res.json();
+        alert(data.msg || 'Wallet Updated Successfully!');
+        loadAdminData();
+      } catch (e) { alert('Backend Error!'); }
     }
 
-    async function resetPassword(userId) {
-      const newPass = prompt('Enter NEW Password:');
-      if (!newPass) return;
-      alert(`Password updated to ${newPass}!`);
+    async function toggleLock(userId) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/toggle-lock`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+        const data = await res.json();
+        alert(data.msg || 'Lock status updated!');
+        loadAdminData();
+      } catch(e) { alert('Error updating lock status'); }
     }
 
-    function toggleLock(userId) {
-      alert(`User Lock Status Updated!`);
+    // LOAD FINANCIAL AND ACTIVITY STATEMENTS
+    async function loadStatements() {
+      const tbody = document.getElementById('statementTableBody');
+      tbody.innerHTML = '<tr><td colspan="5">Fetching live statements...</td></tr>';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/statements`);
+        const data = await res.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          let html = '';
+          data.forEach(st => {
+            const dateStr = new Date(st.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            let badgeClass = 'badge-green';
+            if (st.type.includes('WITHDRAW') || st.type.includes('LOCKED')) badgeClass = 'badge-red';
+            if (st.type.includes('CREATED')) badgeClass = 'badge-orange';
+
+            html += `
+              <tr>
+                <td>${dateStr}</td>
+                <td><strong>${st.username}</strong></td>
+                <td><span class="badge-type ${badgeClass}">${st.type}</span></td>
+                <td><strong>${st.coins} C</strong></td>
+                <td style="color:#8b949e;">${st.remark}</td>
+              </tr>
+            `;
+          });
+          tbody.innerHTML = html;
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5">No statements recorded yet.</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#f85149;">Error loading statements from server.</td></tr>';
+      }
     }
 
     function viewStatement(username) {
-      alert(`Opening Statement Report for ${username}`);
+      showTab('statementTab', document.querySelectorAll('.nav-item')[4]);
     }
 
     function renderMarketData() {
