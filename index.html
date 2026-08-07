@@ -207,7 +207,7 @@
                 <div class="res-box"><small>Single</small>${r.singleDigit}</div>
                 <div class="res-box"><small>Double</small>${r.doubleDigit}</div>
               </div>
-              <div class="res-timer" id="timer-${m.name.replace(/\s+/g, '')}">Next Result in --:--:--</div>
+              <div class="res-timer" id="timer-${m.name.replace(/\s+/g, '')}">Settle in --:--:--</div>
             </div>
           `;
         });
@@ -233,7 +233,7 @@
         const sec = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
 
         const el = document.getElementById(`timer-${m.name.replace(/\s+/g, '')}`);
-        if(el) el.innerText = `Settle in -${h}:${min}:${sec}`;
+        if(el) el.innerText = `Next Result in -${h}:${min}:${sec}`;
       });
     }
 
