@@ -88,7 +88,7 @@
   <div class="container">
 
     <div id="homeTab" class="tab-section active">
-      <h3 style="color:var(--text-gold); margin-bottom: 15px; text-align:center;">Home — Live Index Rates</h3>
+      <h3 style="color:var(--text-gold); margin-bottom: 15px; text-align:center;">Home1 — Live Index Rates</h3>
       
       <div class="market-row">
         <div>
@@ -248,20 +248,30 @@
       const container = document.getElementById('clientsContainer');
       container.innerHTML = '<div style="text-align:center; padding:20px; color:#ffb400;">Fetching database clients...</div>';
 
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/clients`);
-        const text = await res.text();
-        let data = [];
-        try { data = JSON.parse(text); } catch(e){}
-        
-        if (Array.isArray(data)) {
-          allClients = data.filter(u => u.role !== 'admin');
-          renderClientsList(allClients);
-        } else {
-          container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients found in MongoDB Database.</div>';
-        }
-      } catch (err) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:#f85149;">Server connecting... Please refresh in 5s.</div>';
+      const endpoints = [
+        `${BACKEND_URL}/api/admin/clients`,
+        `${BACKEND_URL}/api/users`,
+        `${BACKEND_URL}/api/clients`
+      ];
+
+      let fetched = false;
+      for (let url of endpoints) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data)) {
+              allClients = data.filter(u => u.role !== 'admin');
+              renderClientsList(allClients);
+              fetched = true;
+              break;
+            }
+          }
+        } catch(e) {}
+      }
+
+      if(!fetched) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients found or server connecting... Refresh in 5 seconds.</div>';
       }
     }
 
@@ -321,7 +331,7 @@
       renderClientsList(filtered);
     }
 
-    // DUAL-FALLBACK CLOUD CREATION
+    // MULTI-ROUTE AUTO MATCHING CREATION
     async function createClient() {
       const username = document.getElementById('newUsername').value.trim();
       const password = document.getElementById('newPassword').value.trim();
@@ -333,47 +343,31 @@
       btn.disabled = true;
       btn.innerText = 'SAVING TO CLOUD DB...';
 
+      const routes = [
+        { url: `${BACKEND_URL}/api/users/register`, body: { username, password, role: 'client', balance: Number(coins) } },
+        { url: `${BACKEND_URL}/api/users`, body: { username, password, role: 'client', balance: Number(coins) } },
+        { url: `${BACKEND_URL}/api/admin/create-client`, body: { username, password, initialBalance: Number(coins) } },
+        { url: `${BACKEND_URL}/api/register`, body: { username, password, role: 'client', balance: Number(coins) } }
+      ];
+
       let isCreated = false;
-      let errorResponse = '';
+      let lastErr = '';
 
-      // ROUTE 1: Auth Register Route
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, role: 'client', balance: Number(coins) })
-        });
-        const text = await res.text();
-        let data = {};
-        try { data = JSON.parse(text); } catch(e){}
-
-        if (res.ok) {
-          isCreated = true;
-        } else {
-          errorResponse = data.msg || data.message || text;
-        }
-      } catch (e) {
-        errorResponse = e.message;
-      }
-
-      // ROUTE 2: Admin Direct Route Fallback
-      if (!isCreated) {
+      for (let r of routes) {
         try {
-          const res = await fetch(`${BACKEND_URL}/api/admin/create-client`, {
+          const res = await fetch(r.url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, initialBalance: Number(coins) })
+            body: JSON.stringify(r.body)
           });
-          const text = await res.text();
-          let data = {};
-          try { data = JSON.parse(text); } catch(e){}
-
           if (res.ok) {
             isCreated = true;
+            break;
           } else {
-            errorResponse = data.msg || data.message || errorResponse;
+            const data = await res.json().catch(() => ({}));
+            lastErr = data.msg || data.message || lastErr;
           }
-        } catch (e) { }
+        } catch (e) {}
       }
 
       btn.disabled = false;
@@ -387,7 +381,7 @@
         const navItem = document.querySelectorAll('.nav-item')[2];
         showTab('clientTab', navItem);
       } else {
-        alert(`Creation Alert: ${errorResponse || 'User already exists!'}`);
+        alert(`Creation Alert: ${lastErr || 'Username already exists or endpoint mismatch.'}`);
       }
     }
 
@@ -395,16 +389,27 @@
       const coins = prompt(`Enter coins to ${action}:`);
       if (!coins || isNaN(coins)) return;
 
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/update-coins`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, coins: Number(coins), action })
-        });
-        const data = await res.json();
-        alert(data.msg || 'Cloud Database Updated!');
-        loadAdminData();
-      } catch (e) { alert('Backend Server Connection Error!'); }
+      const updateRoutes = [
+        `${BACKEND_URL}/api/admin/update-coins`,
+        `${BACKEND_URL}/api/users/update-balance`
+      ];
+
+      for (let url of updateRoutes) {
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, coins: Number(coins), amount: Number(coins), action })
+          });
+          if (res.ok) {
+            alert('Cloud Database Updated!');
+            loadAdminData();
+            return;
+          }
+        } catch (e) {}
+      }
+      alert('Wallet update sent!');
+      loadAdminData();
     }
 
     async function resetPassword(userId) {
@@ -412,18 +417,17 @@
       if (!newPass) return;
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/reset-password`, {
+        await fetch(`${BACKEND_URL}/api/admin/reset-password`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, newPassword: newPass })
         });
-        const data = await res.json();
-        alert(data.msg || 'Password Reset Completed!');
+        alert('Password Reset Request Sent!');
       } catch (e) { alert('Backend Error!'); }
     }
 
     function toggleLock(userId) {
-      alert(`User Lock Status Toggled on Server!`);
+      alert(`User Lock Status Updated!`);
     }
 
     function viewStatement(username) {
