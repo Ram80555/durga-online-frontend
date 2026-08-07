@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Durga Online - Client Panel</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .btn-logout-client { background: #da3633; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; margin-left: 10px; }
+    .btn-logout-client:hover { background: #b91c1c; }
+  </style>
 </head>
 <body class="client-panel">
   <div class="header">
@@ -13,6 +17,7 @@
       <span>User: <strong id="uName">---</strong></span> | 
       <span>Bal: <strong id="bal" style="color: #2ebd49;">0</strong> C</span> | 
       <span>Exp: <strong id="exp" style="color: #ffb400;">0</strong> C</span>
+      <button class="btn-logout-client" onclick="clientLogout()">LOGOUT</button>
     </div>
   </div>
 
@@ -53,21 +58,38 @@
     let userSession = JSON.parse(localStorage.getItem('durgaUser'));
     if(!userSession) { window.location.href = 'login.html'; }
 
-    // REALTIME DATABASE BALANCE SYNC
-    async function syncUserBalance() {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/client/user-info/${userSession._id || userSession.username}`);
-        if(res.ok) {
-          const data = await res.json();
-          userSession.balance = data.balance || 0;
-          userSession.exposure = data.exposure || 0;
-          localStorage.setItem('durgaUser', JSON.stringify(userSession));
-        }
-      } catch (err) { }
+    function clientLogout() {
+      localStorage.removeItem('durgaUser');
+      window.location.href = 'login.html';
+    }
 
-      document.getElementById('uName').innerText = userSession.username;
-      document.getElementById('bal').innerText = userSession.balance || 0;
-      document.getElementById('exp').innerText = userSession.exposure || 0;
+    // CONTINUOUS SINGLE DEVICE SESSION TRACKER
+    async function verifyDeviceSession() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/auth/verify-session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            username: userSession.username, 
+            sessionToken: userSession.sessionToken 
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.valid) {
+          alert('Logged out! Your account was logged in from another device.');
+          clientLogout();
+          return;
+        }
+
+        userSession.balance = data.balance || 0;
+        userSession.exposure = data.exposure || 0;
+        document.getElementById('uName').innerText = userSession.username;
+        document.getElementById('bal').innerText = userSession.balance;
+        document.getElementById('exp').innerText = userSession.exposure;
+
+      } catch (err) { }
     }
 
     function checkMarketStatus(openTimeStr, lockTimeStr) {
@@ -160,7 +182,7 @@
           alert(`Prediction placed successfully! ${coins} Coins deducted.`);
           document.getElementById('digitInput').value = '';
           document.getElementById('coinInput').value = '';
-          syncUserBalance();
+          verifyDeviceSession();
         } else {
           alert(data.msg || 'Error placing prediction');
         }
@@ -172,8 +194,8 @@
       }
     }
 
-    syncUserBalance();
-    setInterval(syncUserBalance, 3000);
+    verifyDeviceSession();
+    setInterval(verifyDeviceSession, 3000); // Check session every 3 seconds
     fetchLiveRates();
     setInterval(fetchLiveRates, 5000);
   </script>
