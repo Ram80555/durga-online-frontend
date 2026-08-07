@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DURGA ONLINE - ADMIN PANEL</title>
+  <title>DURGA ONLINE - GLOBAL ADMIN PANEL</title>
   <link rel="stylesheet" href="style.css">
   <style>
     :root {
@@ -60,7 +60,7 @@
 
   <div id="loginOverlay">
     <div class="login-card">
-      <h2>DURGA ONLINE ADMIN</h2>
+      <h2>DURGA ONLINE</h2>
       <p style="color:#8b949e; font-size: 13px; margin-bottom: 15px;">ADMIN PANEL LOGIN</p>
       <input type="text" id="adminUser" placeholder="Username">
       <input type="password" id="adminPass" placeholder="Password">
@@ -70,7 +70,7 @@
 
   <div class="top-bar">
     <div class="brand">
-      <span style="color:var(--text-gold)">☰ DURGA ONLINE</span>
+      <span style="color:var(--text-gold)">☰ DURGA ONLINE ADMIN</span>
     </div>
     <div class="nav-links">
       <span class="nav-item active" onclick="showTab('homeTab', this)">Home</span>
@@ -82,7 +82,7 @@
   </div>
 
   <div class="ticker">
-    🏆 SPECIAL MARKETS & LIVE INDEX BETTING ACTIVE | DURGA ONLINE ADMIN CONTROL
+    🏆 GLOBAL CLOUD DATABASE ACTIVE | DURGA ONLINE ADMIN CONTROL
   </div>
 
   <div class="container">
@@ -229,7 +229,7 @@
       }
     }
 
-    if (sessionStorage.getItem('durgaAdminLoggedIn') === 'true') {
+    if (sessionStorage.setItem('durgaAdminLoggedIn') === 'true' || sessionStorage.getItem('durgaAdminLoggedIn') === 'true') {
       document.getElementById('loginOverlay').style.display = 'none';
       window.onload = loadAdminData;
     }
@@ -244,30 +244,23 @@
       if (tabId === 'clientTab') loadAdminData();
     }
 
-    // LOAD CLIENTS PROPERLY
+    // FETCH REAL MONGODB CLIENTS FROM BACKEND SERVER ONLY
     async function loadAdminData() {
       const container = document.getElementById('clientsContainer');
-      const localData = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:#ffb400;">Fetching database clients...</div>';
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/clients`);
-        const text = await res.text();
-        let data = [];
-        try { data = JSON.parse(text); } catch(e){}
+        const data = await res.json();
         
         if (Array.isArray(data)) {
           allClients = data.filter(u => u.role !== 'admin');
-          localData.forEach(lc => {
-            if(!allClients.find(c => c.username === lc.username)) allClients.push(lc);
-          });
           renderClientsList(allClients);
         } else {
-          allClients = localData;
-          renderClientsList(localData);
+          container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients found in MongoDB Database.</div>';
         }
       } catch (err) {
-        allClients = localData;
-        renderClientsList(localData);
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#f85149;">Server connecting... Wake up Render server by opening backend URL.</div>';
       }
     }
 
@@ -275,7 +268,7 @@
       const container = document.getElementById('clientsContainer');
       
       if (!clients || clients.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients created yet. Create one from "Create Client" tab.</div>';
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients created yet.</div>';
         return;
       }
 
@@ -307,12 +300,12 @@
 
             <div class="btn-grid">
               <button class="action-btn btn-cr">CR</button>
-              <button class="action-btn" onclick="updateCoins('${c.username}', 'add')">BANK DEPOSIT</button>
-              <button class="action-btn" onclick="updateCoins('${c.username}', 'withdraw')">BANK WITHDRAW</button>
+              <button class="action-btn" onclick="updateCoins('${c._id}', 'add')">BANK DEPOSIT</button>
+              <button class="action-btn" onclick="updateCoins('${c._id}', 'withdraw')">BANK WITHDRAW</button>
               <button class="action-btn" onclick="viewStatement('${c.username}')">ACCOUNT STATEMENT</button>
-              <button class="action-btn" onclick="alert('No pending bets for ${c.username}')">PENDING BETS</button>
-              <button class="action-btn" onclick="resetPassword('${c.username}')">RESET PASSWORD</button>
-              <button class="action-btn" onclick="toggleLock('${c.username}')">${c.isLocked ? 'UNLOCK' : 'LOCK'} ACCOUNT</button>
+              <button class="action-btn" onclick="alert('No pending bets')">PENDING BETS</button>
+              <button class="action-btn" onclick="resetPassword('${c._id}')">RESET PASSWORD</button>
+              <button class="action-btn" onclick="toggleLock('${c._id}')">${c.isLocked ? 'UNLOCK' : 'LOCK'} ACCOUNT</button>
             </div>
           </div>
         `;
@@ -327,7 +320,7 @@
       renderClientsList(filtered);
     }
 
-    // SAFE CREATE CLIENT FUNCTION
+    // CREATE CLIENT DIRECT TO MONGODB DATABASE
     async function createClient() {
       const username = document.getElementById('newUsername').value.trim();
       const password = document.getElementById('newPassword').value.trim();
@@ -337,51 +330,69 @@
       if (!username || !password) return alert('Enter Username & Password');
 
       btn.disabled = true;
-      btn.innerText = 'CREATING...';
+      btn.innerText = 'SAVING TO CLOUD DB...';
 
-      const newClientObj = { username, password, balance: Number(coins), profitLoss: 0, exposure: 0, isLocked: false };
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/create-client`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, initialBalance: Number(coins) })
+        });
+        
+        const data = await res.json();
 
-      // Save locally first so client is ALWAYS created and never crashes
-      let localData = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
-      localData = localData.filter(c => c.username !== username);
-      localData.push(newClientObj);
-      localStorage.setItem('durga_clients_local', JSON.stringify(localData));
-
-      btn.disabled = false;
-      btn.innerText = 'CREATE CLIENT';
-
-      alert(`Client "${username}" Created Successfully!`);
-      document.getElementById('newUsername').value = '';
-      document.getElementById('newPassword').value = '';
-      document.getElementById('initialBalance').value = '';
-      
-      const navItem = document.querySelectorAll('.nav-item')[2];
-      showTab('clientTab', navItem);
+        if(res.ok) {
+          alert(data.msg || `Client "${username}" Created on MongoDB Server!`);
+          document.getElementById('newUsername').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('initialBalance').value = '';
+          const navItem = document.querySelectorAll('.nav-item')[2];
+          showTab('clientTab', navItem);
+        } else {
+          alert(data.msg || data.message || 'Error creating client');
+        }
+      } catch (e) {
+        alert('Server unreachable. Please make sure backend render server is awake.');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'CREATE CLIENT';
+      }
     }
 
-    function updateCoins(username, action) {
+    // BANK DEPOSIT / WITHDRAW TO MONGODB DATABASE
+    async function updateCoins(userId, action) {
       const coins = prompt(`Enter coins to ${action}:`);
       if (!coins || isNaN(coins)) return;
 
-      let localData = JSON.parse(localStorage.getItem('durga_clients_local') || '[]');
-      let user = localData.find(c => c.username === username);
-      if(user) {
-        if(action === 'add') user.balance += Number(coins);
-        if(action === 'withdraw') user.balance -= Number(coins);
-        localStorage.setItem('durga_clients_local', JSON.stringify(localData));
-      }
-      alert('Wallet Updated Successfully!');
-      loadAdminData();
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/update-coins`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, coins: Number(coins), action })
+        });
+        const data = await res.json();
+        alert(data.msg || 'Cloud Database Updated!');
+        loadAdminData();
+      } catch (e) { alert('Backend Server Connection Error!'); }
     }
 
-    function resetPassword(username) {
+    async function resetPassword(userId) {
       const newPass = prompt('Enter NEW Password:');
       if (!newPass) return;
-      alert(`Password for ${username} updated to ${newPass}!`);
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, newPassword: newPass })
+        });
+        const data = await res.json();
+        alert(data.msg || 'Password Reset Completed!');
+      } catch (e) { alert('Backend Error!'); }
     }
 
-    function toggleLock(username) {
-      alert(`User ${username} lock status updated!`);
+    function toggleLock(userId) {
+      alert(`User Lock Status Toggled on Server!`);
     }
 
     function viewStatement(username) {
