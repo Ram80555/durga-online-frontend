@@ -36,8 +36,12 @@
 
     .container { padding: 12px; max-width: 1000px; margin: 0 auto; }
 
-    .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 15px; }
-    .res-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; }
+    /* SINGLE LINE HORIZONTAL SCROLLING RESULT CARDS STRIP */
+    .results-grid { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 8px; margin-bottom: 15px; scrollbar-width: thin; }
+    .results-grid::-webkit-scrollbar { height: 4px; }
+    .results-grid::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+
+    .res-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; flex: 0 0 140px; min-width: 130px; }
     .res-title { font-size: 12px; font-weight: bold; color: #8b949e; margin-bottom: 4px; }
     .res-box { background: #0d1117; border: 1px solid var(--text-gold); color: var(--text-gold); border-radius: 4px; padding: 6px 12px; font-size: 18px; font-weight: bold; display: inline-block; margin: 4px 0; }
     .res-timer { font-size: 10px; color: #3fb950; font-weight: bold; margin-top: 2px; }
@@ -52,6 +56,11 @@
     .odds-box { display: flex; gap: 8px; margin-top: 10px; }
     .mode-box { flex: 1; padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid var(--border); background: #0d1117; font-weight: bold; font-size: 12px; }
     .mode-box.selected { border-color: var(--text-gold); background: #21262d; color: var(--text-gold); }
+
+    /* SINGLE DIGIT A & B SELECTOR BUTTONS */
+    .ab-selector-group { display: flex; gap: 8px; margin-top: 10px; }
+    .ab-btn { flex: 1; padding: 8px; background: #0d1117; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-align: center; }
+    .ab-btn.selected { border-color: #2ebd49; background: #1b4721; color: #fff; }
 
     input { width: 100%; padding: 10px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
     
@@ -97,6 +106,8 @@
   <div class="container">
 
     <h4 style="color:var(--text-gold); margin-bottom: 8px; font-size: 14px;">LATEST MARKET CLOSING RESULTS</h4>
+    
+    <!-- SINGLE HORIZONTAL LINE STRIP FOR RESULTS -->
     <div class="results-grid" id="resultsContainer">
     </div>
 
@@ -120,10 +131,18 @@
         <div class="mode-box" id="doubleMode" onclick="setMode('double')">Double Digit<br><small style="color:#8b949e;">Payout 1 : 80</small></div>
       </div>
 
+      <!-- SINGLE DIGIT A / B SELECTOR BUTTONS -->
+      <div class="ab-selector-group" id="abSelectorGroup">
+        <button class="ab-btn selected" id="btnTypeA" onclick="setSingleSubMode('A')">Single (A) [2nd Last Digit]</button>
+        <button class="ab-btn" id="btnTypeB" onclick="setSingleSubMode('B')">Single (B) [Last Digit]</button>
+      </div>
+
       <div style="margin-top: 12px;">
-        <p style="font-size: 12px; margin-bottom: 4px;">Selected Mode: <strong id="currentMode" style="color: var(--text-gold);">Single Digit (0-9)</strong></p>
-        <input type="text" id="digitInput" placeholder="Enter Digit (0-9)" maxlength="1">
-        <input type="number" id="coinInput" placeholder="Enter Coins Amount">
+        <p style="font-size: 12px; margin-bottom: 4px;">Selected Mode: <strong id="currentMode" style="color: var(--text-gold);">Single Digit (A) (0-9)</strong></p>
+        
+        <!-- NUMERIC KEYBOARD FORCED VIA inputmode="numeric" -->
+        <input type="text" id="digitInput" placeholder="Enter Digit (0-9)" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+        <input type="number" id="coinInput" placeholder="Enter Coins Amount" inputmode="numeric">
         
         <div class="btn-action-group">
           <button class="btn-submit" id="betBtn" onclick="placeBet()">PLACE BET</button>
@@ -154,7 +173,9 @@
     ];
 
     let activeMarket = '';
-    let activeMode = 'single';
+    let activeMode = 'single'; // 'single' or 'double'
+    let singleSubMode = 'A'; // 'A' or 'B'
+
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
     let userSession = JSON.parse(localStorage.getItem('durgaUser'));
 
@@ -196,14 +217,12 @@
       } catch (err) {}
     }
 
-    // LOCK CHECK (WEEKENDS SATURDAY & SUNDAY REMAIN OPEN FOR BETTING)
     function isMarketLocked(m) {
       const now = new Date();
       const istOffset = 5.5 * 60 * 60 * 1000;
       const istTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
-      const dayOfWeek = istTime.getDay(); // 0 = Sunday, 6 = Saturday
+      const dayOfWeek = istTime.getDay();
 
-      // WEEKENDS ARE NOT LOCKED (OPEN FOR MONDAY RESULT)
       if (dayOfWeek === 0 || dayOfWeek === 6) return false;
 
       const curMins = istTime.getHours() * 60 + istTime.getMinutes();
@@ -313,17 +332,36 @@
     function setMode(mode) {
       activeMode = mode;
       const digitInput = document.getElementById('digitInput');
+      const abGroup = document.getElementById('abSelectorGroup');
+
       if (mode === 'single') {
-        document.getElementById('currentMode').innerText = 'Single Digit (0-9)';
-        digitInput.placeholder = 'Enter Digit (0-9)';
-        digitInput.maxLength = 1;
+        abGroup.style.display = 'flex';
+        setSingleSubMode(singleSubMode);
       } else {
+        abGroup.style.display = 'none';
         document.getElementById('currentMode').innerText = 'Double Digit (00-99)';
         digitInput.placeholder = 'Enter Digit (00-99)';
         digitInput.maxLength = 2;
       }
       document.getElementById('singleMode').classList.toggle('selected', mode === 'single');
       document.getElementById('doubleMode').classList.toggle('selected', mode === 'double');
+    }
+
+    function setSingleSubMode(sub) {
+      singleSubMode = sub;
+      const digitInput = document.getElementById('digitInput');
+      digitInput.placeholder = 'Enter Digit (0-9)';
+      digitInput.maxLength = 1;
+
+      if (sub === 'A') {
+        document.getElementById('currentMode').innerText = 'Single (A) [2nd Last Digit] (0-9)';
+        document.getElementById('btnTypeA').classList.add('selected');
+        document.getElementById('btnTypeB').classList.remove('selected');
+      } else {
+        document.getElementById('currentMode').innerText = 'Single (B) [Last Digit] (0-9)';
+        document.getElementById('btnTypeB').classList.add('selected');
+        document.getElementById('btnTypeA').classList.remove('selected');
+      }
     }
 
     async function placeBet() {
@@ -333,14 +371,17 @@
 
       if (!digit || !coins || activeMarket === '') return alert('Enter digit and coins');
 
+      let finalType = 'double';
       if (activeMode === 'single') {
         if (!/^[0-9]$/.test(digit)) {
           return alert('Single Digit must be strictly 1 number between 0 and 9!');
         }
+        finalType = singleSubMode === 'A' ? 'single_a' : 'single_b';
       } else if (activeMode === 'double') {
         if (!/^[0-9]{2}$/.test(digit)) {
           return alert('Double Digit must be strictly 2 numbers between 00 and 99!');
         }
+        finalType = 'double';
       }
 
       if (userSession.balance < coins) return alert('Insufficient Balance!');
@@ -356,7 +397,7 @@
             username: userSession.username,
             userId: userSession._id || userSession.username,
             market: activeMarket,
-            type: activeMode,
+            type: finalType,
             selectedDigit: digit,
             coins: coins
           })
@@ -393,7 +434,11 @@
           let html = `<table><thead><tr><th>Date & Time</th><th>Market</th><th>Type</th><th>Digit</th><th>Coins</th></tr></thead><tbody>`;
           bets.forEach(b => {
             const dateStr = new Date(b.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-            html += `<tr><td>${dateStr}</td><td><strong>${b.market}</strong></td><td>${b.type.toUpperCase()}</td><td><strong style="color:var(--text-gold);">${b.digit}</strong></td><td>${b.coins} C</td></tr>`;
+            let displayType = b.type.toUpperCase();
+            if(b.type === 'single_a') displayType = 'SINGLE (A)';
+            if(b.type === 'single_b') displayType = 'SINGLE (B)';
+
+            html += `<tr><td>${dateStr}</td><td><strong>${b.market}</strong></td><td>${displayType}</td><td><strong style="color:var(--text-gold);">${b.digit}</strong></td><td>${b.coins} C</td></tr>`;
           });
           html += `</tbody></table>`;
           document.getElementById('modalBody').innerHTML = html;
@@ -403,7 +448,6 @@
       } catch (e) { document.getElementById('modalBody').innerHTML = 'Error loading bets.'; }
     }
 
-    // UPDATED STATEMENT TABLE WITH OLD BAL & NEW BAL COLUMNS
     async function openStatement() {
       document.getElementById('dropdownMenu').classList.remove('show');
       document.getElementById('modalTitle').innerText = 'My Account Statement History';
