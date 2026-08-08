@@ -34,17 +34,18 @@
     .menu-item:hover { background: #21262d; color: var(--text-gold); }
     .menu-item.logout { color: #f85149; border-bottom: none; }
 
-    .container { padding: 12px; max-width: 1000px; margin: 0 auto; }
+    .container { padding: 10px; max-width: 1000px; margin: 0 auto; }
 
-    /* SINGLE LINE HORIZONTAL SCROLLING RESULT CARDS STRIP */
-    .results-grid { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 8px; margin-bottom: 15px; scrollbar-width: thin; }
-    .results-grid::-webkit-scrollbar { height: 4px; }
-    .results-grid::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+    /* FULLY RESPONSIVE NO-SCROLL RESULT CARDS GRID */
+    .results-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+    @media (max-width: 600px) {
+      .results-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    }
 
-    .res-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; flex: 0 0 140px; min-width: 130px; }
-    .res-title { font-size: 12px; font-weight: bold; color: #8b949e; margin-bottom: 4px; }
-    .res-box { background: #0d1117; border: 1px solid var(--text-gold); color: var(--text-gold); border-radius: 4px; padding: 6px 12px; font-size: 18px; font-weight: bold; display: inline-block; margin: 4px 0; }
-    .res-timer { font-size: 10px; color: #3fb950; font-weight: bold; margin-top: 2px; }
+    .res-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 4px; text-align: center; width: 100%; }
+    .res-title { font-size: 10px; font-weight: bold; color: #8b949e; margin-bottom: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+    .res-box { background: #0d1117; border: 1px solid var(--text-gold); color: var(--text-gold); border-radius: 4px; padding: 4px; font-size: 14px; font-weight: bold; display: block; margin: 2px 0; }
+    .res-timer { font-size: 8px; color: #3fb950; font-weight: bold; margin-top: 1px; white-space: nowrap; }
 
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
     .market-row { background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
@@ -57,7 +58,7 @@
     .mode-box { flex: 1; padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; border: 1px solid var(--border); background: #0d1117; font-weight: bold; font-size: 12px; }
     .mode-box.selected { border-color: var(--text-gold); background: #21262d; color: var(--text-gold); }
 
-    /* SINGLE DIGIT A & B SELECTOR BUTTONS */
+    /* SINGLE DIGIT ANDAR & BAHAR SELECTOR BUTTONS */
     .ab-selector-group { display: flex; gap: 8px; margin-top: 10px; }
     .ab-btn { flex: 1; padding: 8px; background: #0d1117; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-align: center; }
     .ab-btn.selected { border-color: #2ebd49; background: #1b4721; color: #fff; }
@@ -73,9 +74,17 @@
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
     th, td { border: 1px solid var(--border); padding: 6px; text-align: center; }
     th { background: #161b22; color: var(--text-gold); }
+
+    /* AUTO DISAPPEARING WEBSITE TOAST NOTIFICATION */
+    .toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #fff; z-index: 10000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.6); text-align: center; min-width: 250px; }
+    .toast-success { background: #1b4721; border: 1px solid #4ade80; color: #4ade80; }
+    .toast-error { background: #451a1a; border: 1px solid #f87171; color: #f87171; }
   </style>
 </head>
 <body>
+
+  <!-- CUSTOM AUTO TOAST -->
+  <div class="toast-box" id="customToast"></div>
 
   <div class="header">
     <div class="brand">
@@ -105,9 +114,9 @@
 
   <div class="container">
 
-    <h4 style="color:var(--text-gold); margin-bottom: 8px; font-size: 14px;">LATEST MARKET CLOSING RESULTS</h4>
+    <h4 style="color:var(--text-gold); margin-bottom: 6px; font-size: 13px;">LATEST MARKET CLOSING RESULTS</h4>
     
-    <!-- SINGLE HORIZONTAL LINE STRIP FOR RESULTS -->
+    <!-- RESPONSIVE VIEWABLE RESULTS GRID -->
     <div class="results-grid" id="resultsContainer">
     </div>
 
@@ -131,16 +140,15 @@
         <div class="mode-box" id="doubleMode" onclick="setMode('double')">Double Digit<br><small style="color:#8b949e;">Payout 1 : 80</small></div>
       </div>
 
-      <!-- SINGLE DIGIT A / B SELECTOR BUTTONS -->
+      <!-- UPDATED ANDAR AND BAHAR BUTTONS -->
       <div class="ab-selector-group" id="abSelectorGroup">
-        <button class="ab-btn selected" id="btnTypeA" onclick="setSingleSubMode('A')">Single (A) [2nd Last Digit]</button>
-        <button class="ab-btn" id="btnTypeB" onclick="setSingleSubMode('B')">Single (B) [Last Digit]</button>
+        <button class="ab-btn selected" id="btnTypeA" onclick="setSingleSubMode('A')">Andar</button>
+        <button class="ab-btn" id="btnTypeB" onclick="setSingleSubMode('B')">Bahar</button>
       </div>
 
       <div style="margin-top: 12px;">
-        <p style="font-size: 12px; margin-bottom: 4px;">Selected Mode: <strong id="currentMode" style="color: var(--text-gold);">Single Digit (A) (0-9)</strong></p>
+        <p style="font-size: 12px; margin-bottom: 4px;">Selected Mode: <strong id="currentMode" style="color: var(--text-gold);">Single (Andar) (0-9)</strong></p>
         
-        <!-- NUMERIC KEYBOARD FORCED VIA inputmode="numeric" -->
         <input type="text" id="digitInput" placeholder="Enter Digit (0-9)" maxlength="1" inputmode="numeric" pattern="[0-9]*">
         <input type="number" id="coinInput" placeholder="Enter Coins Amount" inputmode="numeric">
         
@@ -173,13 +181,25 @@
     ];
 
     let activeMarket = '';
-    let activeMode = 'single'; // 'single' or 'double'
-    let singleSubMode = 'A'; // 'A' or 'B'
+    let activeMode = 'single';
+    let singleSubMode = 'A';
 
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
     let userSession = JSON.parse(localStorage.getItem('durgaUser'));
 
     if(!userSession) { window.location.href = 'login.html'; }
+
+    // AUTO TOAST NOTIFICATION SYSTEM
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('customToast');
+      toast.innerText = message;
+      toast.className = 'toast-box ' + (isSuccess ? 'toast-success' : 'toast-error');
+      toast.style.display = 'block';
+
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 1500);
+    }
 
     function toggleMenu() {
       document.getElementById('dropdownMenu').classList.toggle('show');
@@ -205,8 +225,8 @@
         });
         const data = await res.json();
         if (!data.valid) {
-          alert('Logged out! Account logged in from another device.');
-          clientLogout();
+          showToast('Logged out! Account opened on another device.', false);
+          setTimeout(clientLogout, 1200);
           return;
         }
         userSession.balance = data.balance || 0;
@@ -253,8 +273,8 @@
           html += `
             <div class="res-card">
               <div class="res-title">${m.name}</div>
-              <div class="res-box"><small>Double</small>${r.doubleDigit || '--'}</div>
-              <div class="res-timer" id="timer-${m.name.replace(/\s+/g, '')}">Next Result in --:--:--</div>
+              <div class="res-box">${r.doubleDigit || '--'}</div>
+              <div class="res-timer" id="timer-${m.name.replace(/\s+/g, '')}">--:--:--</div>
             </div>
           `;
         });
@@ -284,7 +304,7 @@
         const sec = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
 
         const el = document.getElementById(`timer-${m.name.replace(/\s+/g, '')}`);
-        if(el) el.innerText = `Next Result in -${h}:${min}:${sec}`;
+        if(el) el.innerText = `Next in -${h}:${min}:${sec}`;
       });
     }
 
@@ -302,7 +322,7 @@
         if (isWeekend) statusText = 'OPEN (FOR MON)';
 
         html += `
-          <div class="market-row" onclick="${locked ? `alert('Market Closed for ${m.name}. Reopens at ${m.unlockTime}')` : `selectMarket('${m.name}')`}">
+          <div class="market-row" onclick="${locked ? `showToast('Market Closed for ${m.name}. Reopens at ${m.unlockTime}', false)` : `selectMarket('${m.name}')`}">
             <div>
               <strong>${m.name}</strong>
               <small style="display:block; color:#8b949e;">Settle: ${m.resultTime} IST ${isWeekend ? '(Mon)' : ''}</small>
@@ -354,11 +374,11 @@
       digitInput.maxLength = 1;
 
       if (sub === 'A') {
-        document.getElementById('currentMode').innerText = 'Single (A) [2nd Last Digit] (0-9)';
+        document.getElementById('currentMode').innerText = 'Single (Andar) (0-9)';
         document.getElementById('btnTypeA').classList.add('selected');
         document.getElementById('btnTypeB').classList.remove('selected');
       } else {
-        document.getElementById('currentMode').innerText = 'Single (B) [Last Digit] (0-9)';
+        document.getElementById('currentMode').innerText = 'Single (Bahar) (0-9)';
         document.getElementById('btnTypeB').classList.add('selected');
         document.getElementById('btnTypeA').classList.remove('selected');
       }
@@ -369,22 +389,22 @@
       const coins = Number(document.getElementById('coinInput').value);
       const btn = document.getElementById('betBtn');
 
-      if (!digit || !coins || activeMarket === '') return alert('Enter digit and coins');
+      if (!digit || !coins || activeMarket === '') return showToast('Enter digit and coins', false);
 
       let finalType = 'double';
       if (activeMode === 'single') {
         if (!/^[0-9]$/.test(digit)) {
-          return alert('Single Digit must be strictly 1 number between 0 and 9!');
+          return showToast('Single Digit must be 1 number between 0 and 9!', false);
         }
         finalType = singleSubMode === 'A' ? 'single_a' : 'single_b';
       } else if (activeMode === 'double') {
         if (!/^[0-9]{2}$/.test(digit)) {
-          return alert('Double Digit must be strictly 2 numbers between 00 and 99!');
+          return showToast('Double Digit must be 2 numbers between 00 and 99!', false);
         }
         finalType = 'double';
       }
 
-      if (userSession.balance < coins) return alert('Insufficient Balance!');
+      if (userSession.balance < coins) return showToast('Insufficient Balance!', false);
 
       btn.disabled = true;
       btn.innerText = 'PLACING...';
@@ -405,13 +425,13 @@
         
         const data = await res.json();
         if(res.ok) {
-          alert(`Bet Placed Successfully! ${coins} Coins deducted.`);
+          showToast(`Bet Placed Successfully! ${coins} Coins deducted.`, true);
           closeBetModal();
           verifyDeviceSession();
         } else {
-          alert(data.msg || data.message || 'Error placing bet');
+          showToast(data.msg || data.message || 'Error placing bet', false);
         }
-      } catch (err) { alert('Server response error. Please try again.'); }
+      } catch (err) { showToast('Server response error.', false); }
       finally {
         btn.disabled = false;
         btn.innerText = 'PLACE BET';
@@ -435,8 +455,8 @@
           bets.forEach(b => {
             const dateStr = new Date(b.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
             let displayType = b.type.toUpperCase();
-            if(b.type === 'single_a') displayType = 'SINGLE (A)';
-            if(b.type === 'single_b') displayType = 'SINGLE (B)';
+            if(b.type === 'single_a') displayType = 'SINGLE (ANDAR)';
+            if(b.type === 'single_b') displayType = 'SINGLE (BAHAR)';
 
             html += `<tr><td>${dateStr}</td><td><strong>${b.market}</strong></td><td>${displayType}</td><td><strong style="color:var(--text-gold);">${b.digit}</strong></td><td>${b.coins} C</td></tr>`;
           });
@@ -496,7 +516,7 @@
       const oldPassword = document.getElementById('oldPassInput').value.trim();
       const newPassword = document.getElementById('newPassInput').value.trim();
 
-      if(!oldPassword || !newPassword) return alert('Enter both Old and New password.');
+      if(!oldPassword || !newPassword) return showToast('Enter both Old and New password.', false);
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/client/change-password`, {
@@ -506,12 +526,12 @@
         });
         const data = await res.json();
         if(res.ok) {
-          alert('Password changed successfully! Please login again.');
-          clientLogout();
+          showToast('Password changed! Login again.', true);
+          setTimeout(clientLogout, 1200);
         } else {
-          alert(data.msg || 'Error changing password.');
+          showToast(data.msg || 'Error changing password.', false);
         }
-      } catch (e) { alert('Server error.'); }
+      } catch (e) { showToast('Server error.', false); }
     }
 
     verifyDeviceSession();
