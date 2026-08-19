@@ -37,6 +37,7 @@
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
     input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 13px; }
     .btn-action { background: #238636; color: white; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; width: 100%; }
+    .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
     th, td { border: 1px solid var(--card-border); padding: 8px 10px; text-align: center; }
@@ -49,7 +50,6 @@
     .btn-lock { background: #8957e5; }
     .btn-unlock { background: #2ea043; }
 
-    /* TOAST NOTIFICATION */
     .toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #fff; z-index: 10000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.6); text-align: center; min-width: 250px; }
     .toast-success { background: #1b4721; border: 1px solid #4ade80; color: #4ade80; }
     .toast-error { background: #451a1a; border: 1px solid #f87171; color: #f87171; }
@@ -71,7 +71,6 @@
 
   <div class="container">
 
-    <!-- STATS ROW -->
     <div class="stats-row">
       <div class="stat-card">
         <h4 id="stat1Title">Total Managed Accounts</h4>
@@ -83,7 +82,6 @@
       </div>
     </div>
 
-    <!-- LIVE MARKET ANALYSIS SECTION -->
     <div class="card">
       <h3 class="card-title" id="analysisTitle">Live Market Analysis (Active Predictions)</h3>
       <div style="overflow-x: auto;">
@@ -105,18 +103,16 @@
       </div>
     </div>
 
-    <!-- CREATE ACCOUNT SECTION (CREATE ADMIN vs CREATE USER) -->
     <div class="card">
       <h3 class="card-title" id="createTitle">Create Account</h3>
       <div class="form-grid">
-        <input type="text" id="newUsername" placeholder="Enter Username">
-        <input type="password" id="newPassword" placeholder="Enter Password">
-        <input type="number" id="newInitialCoins" placeholder="Initial Coins">
+        <input type="text" id="newUsername" placeholder="Enter Username" autocomplete="off">
+        <input type="password" id="newPassword" placeholder="Enter Password" autocomplete="new-password">
+        <input type="number" id="newInitialCoins" placeholder="Initial Coins (Optional)">
         <button class="btn-action" id="createBtn" onclick="handleCreateAccount()">CREATE</button>
       </div>
     </div>
 
-    <!-- ACCOUNTS LIST (ADMIN LIST vs USER LIST) -->
     <div class="card">
       <h3 class="card-title" id="tableTitle">Registered Accounts</h3>
       <div style="overflow-x: auto;">
@@ -137,7 +133,6 @@
       </div>
     </div>
 
-    <!-- STATEMENT LOGS (SUPER ADMIN vs NORMAL ADMIN) -->
     <div class="card">
       <h3 class="card-title" id="statementTitle">Statement History</h3>
       <div style="overflow-x: auto;">
@@ -177,7 +172,7 @@
       toast.innerText = message;
       toast.className = 'toast-box ' + (isSuccess ? 'toast-success' : 'toast-error');
       toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 1800);
+      setTimeout(() => { toast.style.display = 'none'; }, 2500);
     }
 
     function adminLogout() {
@@ -192,7 +187,7 @@
       if (isSuperAdmin) {
         roleBadge.innerText = 'SUPER ADMIN';
         roleBadge.className = 'role-badge super-badge';
-        document.getElementById('adminBalContainer').style.display = 'none'; // Super Admin balance is hidden
+        document.getElementById('adminBalContainer').style.display = 'none';
         document.getElementById('stat1Title').innerText = 'Total Registered Admins';
         document.getElementById('stat2Title').innerText = 'Total Coins Distributed to Admins';
         document.getElementById('analysisTitle').innerText = 'Market Analysis (All Sub-Admins Combined Total)';
@@ -203,7 +198,7 @@
       } else {
         roleBadge.innerText = 'ADMIN';
         roleBadge.className = 'role-badge admin-badge';
-        document.getElementById('adminBalContainer').style.display = 'inline'; // Normal Admin shows balance
+        document.getElementById('adminBalContainer').style.display = 'inline';
         document.getElementById('stat1Title').innerText = 'My Clients';
         document.getElementById('stat2Title').innerText = 'Total Coins in Clients';
         document.getElementById('analysisTitle').innerText = 'Market Analysis (My Clients Predictions)';
@@ -230,13 +225,22 @@
       }
     }
 
-    // CREATE ACCOUNT
     async function handleCreateAccount() {
-      const username = document.getElementById('newUsername').value.trim();
-      const password = document.getElementById('newPassword').value.trim();
-      const coins = Number(document.getElementById('newInitialCoins').value) || 0;
+      const uInput = document.getElementById('newUsername');
+      const pInput = document.getElementById('newPassword');
+      const cInput = document.getElementById('newInitialCoins');
+      const btn = document.getElementById('createBtn');
 
-      if (!username || !password) return showToast('Enter username and password', false);
+      const username = uInput.value.trim();
+      const password = pInput.value.trim();
+      const coins = Number(cInput.value) || 0;
+
+      if (!username || !password) {
+        return showToast('Please enter both username and password!', false);
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'CREATING...';
 
       const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/create-admin` : `${BACKEND_URL}/api/admin/create-client`;
       const payload = isSuperAdmin ? {
@@ -258,21 +262,26 @@
           body: JSON.stringify(payload)
         });
         const data = await res.json();
+
         if (res.ok) {
-          showToast(data.msg, true);
-          document.getElementById('newUsername').value = '';
-          document.getElementById('newPassword').value = '';
-          document.getElementById('newInitialCoins').value = '';
+          showToast(data.msg || 'Account created successfully!', true);
+          uInput.value = '';
+          pInput.value = '';
+          cInput.value = '';
           loadTableData();
           refreshAdminWallet();
           loadStatements();
         } else {
           showToast(data.msg || 'Error creating account', false);
         }
-      } catch (err) { showToast('Server connection error', false); }
+      } catch (err) {
+        showToast('Server connection error. Check backend status.', false);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = isSuperAdmin ? 'CREATE ADMIN' : 'CREATE USER';
+      }
     }
 
-    // LOAD MARKET ANALYSIS (AGGREGATED FOR SUPER ADMIN, OWN FOR ADMIN)
     async function loadMarketAnalysis() {
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/market-analysis/${adminSession.username}`);
@@ -298,7 +307,6 @@
       } catch(e){}
     }
 
-    // LOAD ACCOUNTS TABLE (ADMIN LIST OR USER LIST)
     async function loadTableData() {
       const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/admins` : `${BACKEND_URL}/api/admin/clients/${adminSession.username}`;
       try {
@@ -343,7 +351,6 @@
       }
     }
 
-    // COINS ACTION (DEPOSIT / WITHDRAW)
     async function manageCoins(targetUsername, action) {
       const amountPrompt = prompt(`Enter coins to ${action === 'add' ? 'DEPOSIT to' : 'WITHDRAW from'} ${targetUsername}:`);
       if (!amountPrompt || isNaN(amountPrompt) || Number(amountPrompt) <= 0) return;
@@ -380,7 +387,6 @@
       } catch(e) { showToast('Server error', false); }
     }
 
-    // CHANGE PASSWORD FOR ADMIN OR USER
     async function changeAccountPassword(targetUsername) {
       const newPass = prompt(`Enter new password for ${targetUsername}:`);
       if (!newPass) return;
@@ -412,7 +418,6 @@
       } catch(e) { showToast('Server error', false); }
     }
 
-    // TOGGLE LOCK / UNLOCK
     async function toggleAccountLock(targetUsername) {
       if (!confirm(`Are you sure you want to change lock status for ${targetUsername}?`)) return;
 
@@ -442,7 +447,6 @@
       } catch(e) { showToast('Server error', false); }
     }
 
-    // LOAD STATEMENTS
     async function loadStatements() {
       const endpoint = `${BACKEND_URL}/api/admin/statements/${adminSession.username}`;
       try {
