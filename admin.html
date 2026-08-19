@@ -329,7 +329,7 @@
     th, td { border: 1px solid rgba(255, 255, 255, 0.08); padding: 8px; text-align: center; }
     th { background: rgba(14, 20, 28, 0.9); color: var(--text-gold); font-weight: 800; }
 
-    /* LARGE MODAL (STATEMENT / BETS) */
+    /* LARGE MODAL */
     .modal-overlay {
       position: fixed;
       top:0; left:0; width:100%; height:100%;
@@ -354,7 +354,7 @@
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
     }
 
-    /* COMPACT POPUP MODAL (REPLACES DEVICE PROMPT/CONFIRM) */
+    /* COMPACT IN-APP POPUP MODAL */
     .action-dialog-overlay {
       position: fixed;
       top:0; left:0; width:100%; height:100%;
@@ -394,6 +394,10 @@
       color: #9ab0c4;
       margin: 0 0 14px 0;
       line-height: 1.4;
+    }
+    .dialog-desc strong {
+      color: #ffffff;
+      font-weight: 800;
     }
     .dialog-input {
       width: 100%;
@@ -465,7 +469,7 @@
 
   <div class="toast-box" id="customToast"></div>
 
-  <!-- IN-APP POPUP DIALOG (REPLACES BROWSER POPUP PROMPT) -->
+  <!-- IN-APP POPUP DIALOG -->
   <div class="action-dialog-overlay" id="actionDialogOverlay">
     <div class="action-dialog-card">
       <h3 class="dialog-title" id="dialogTitle">Dialog Title</h3>
@@ -697,11 +701,11 @@
       setTimeout(() => { toast.style.display = 'none'; }, 2500);
     }
 
-    // CUSTOM IN-APP DIALOG POPUP CONTROLLER
+    // FIXED: Uses innerHTML to render bold names correctly
     function openActionDialog({ title, desc, inputs = [], confirmBtnText = 'CONFIRM', confirmBtnClass = 'dialog-btn-primary', onConfirm }) {
       const overlay = document.getElementById('actionDialogOverlay');
       document.getElementById('dialogTitle').innerText = title;
-      document.getElementById('dialogDesc').innerText = desc;
+      document.getElementById('dialogDesc').innerHTML = desc;
       
       const container = document.getElementById('dialogInputsContainer');
       container.innerHTML = '';
@@ -1091,7 +1095,7 @@
       renderAccountCards(filtered);
     }
 
-    // IN-APP POPUP FOR COIN DEPOSIT & WITHDRAW
+    // IN-APP POPUP FOR COIN DEPOSIT & WITHDRAW (WITH BOLD USERNAME)
     function manageCoins(targetUsername, action) {
       const isAdd = (action === 'add');
       openActionDialog({
