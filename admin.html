@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Durga Online - Admin Panel</title>
+  <title>Durga Online - Admin Management Panel</title>
   <style>
     :root {
       --bg: #090c10;
@@ -16,28 +16,124 @@
     * { box-sizing: border-box; }
     body { background: var(--bg); color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
 
-    .header { background: #161b22; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); }
-    .brand { font-size: 18px; font-weight: bold; color: var(--text-gold); }
-    .admin-info { font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 12px; }
-    .role-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-    .super-badge { background: #6e40c9; color: #fff; }
-    .admin-badge { background: #d97706; color: #fff; }
-    .btn-logout { background: #da3633; color: white; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+    .admin-header {
+      background: #000000;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #21262d;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      font-size: 18px;
+      font-weight: 900;
+      color: #ffb400;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .balance-badge-box {
+      background: #ffffff;
+      color: #000000;
+      padding: 5px 12px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      font-size: 12px;
+      line-height: 1.35;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      min-width: 125px;
+    }
+    .balance-badge-box strong { font-size: 13px; font-weight: 800; }
+    .upline-text { color: #000; font-style: italic; font-weight: 800; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: #e6edf3;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 4px;
+      transition: 0.2s;
+    }
+    .nav-tab-btn:hover, .nav-tab-btn.active {
+      background: #21262d;
+      color: var(--text-gold);
+    }
+
+    .user-menu-container { position: relative; }
+    .user-menu-btn {
+      background: #161b22;
+      color: #fff;
+      border: 1px solid #30363d;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .dropdown-box {
+      position: absolute;
+      right: 0;
+      top: 36px;
+      background: #161b22;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      display: none;
+      flex-direction: column;
+      width: 180px;
+      z-index: 1000;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.7);
+    }
+    .dropdown-box.show { display: flex; }
+    .dropdown-item {
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #fff;
+      cursor: pointer;
+      border-bottom: 1px solid #21262d;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dropdown-item:hover { background: #21262d; color: var(--text-gold); }
+    .dropdown-item.logout { color: #f85149; border-bottom: none; }
 
     .container { padding: 15px; max-width: 1100px; margin: 0 auto; }
-    
-    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
-    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; text-align: center; }
-    .stat-card h4 { margin: 0 0 6px 0; font-size: 12px; color: #8b949e; text-transform: uppercase; }
-    .stat-card div { font-size: 20px; font-weight: bold; color: #fff; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; margin-bottom: 15px; }
     .card-title { margin-top: 0; font-size: 16px; color: var(--text-gold); border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 12px; }
 
-    .form-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-    .form-grid input { flex: 1; min-width: 180px; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 13px; }
-    .btn-action { background: #238636; color: white; border: none; padding: 10px 18px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; min-width: 140px; }
+    .form-grid { display: flex; flex-direction: column; gap: 12px; max-width: 480px; }
+    .form-grid input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 14px; }
+    .btn-action { background: #238636; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
     .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px; }
+    .report-box { background: #0d1117; border: 1px solid var(--card-border); border-radius: 6px; padding: 12px; text-align: center; }
+    .report-box h4 { margin: 0 0 6px 0; font-size: 11px; color: #8b949e; text-transform: uppercase; }
+    .report-box div { font-size: 18px; font-weight: bold; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
     th, td { border: 1px solid var(--card-border); padding: 8px 10px; text-align: center; }
@@ -59,99 +155,175 @@
 
   <div class="toast-box" id="customToast"></div>
 
-  <div class="header">
-    <div class="brand">DURGA ONLINE - MANAGEMENT PANEL</div>
-    <div class="admin-info">
-      <span class="role-badge" id="roleBadge">ADMIN</span>
-      <span>User: <strong id="adminName">---</strong></span>
-      <span id="adminBalContainer" style="color: #3fb950; display: none;">Balance: <strong id="adminBal">0</strong> C</span>
-      <button class="btn-logout" type="button" onclick="adminLogout()">Logout</button>
+  <div class="admin-header">
+    <div class="header-left">
+      <div class="brand-logo">🐯 DURGA ONLINE</div>
+      
+      <div class="balance-badge-box">
+        <div>Bal : <strong id="headerBal">0</strong></div>
+        <div>Upline : <strong class="upline-text" id="headerUpline">0</strong></div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="nav-tab-btn active" id="btnTabMarket" onclick="switchTab('tabMarket')">Market ▾</button>
+      <button class="nav-tab-btn" id="btnTabAccounts" onclick="switchTab('tabAccounts')"><span id="tabAccountsTitle">Client List</span> ▾</button>
+      <button class="nav-tab-btn" id="btnTabCreate" onclick="switchTab('tabCreate')"><span id="tabCreateTitle">Create Client</span></button>
+
+      <!-- UPDATED PROFILE DROPDOWN MENU -->
+      <div class="user-menu-container">
+        <button class="user-menu-btn" onclick="toggleUserDropdown()"><span id="adminUsernameDisplay">Admin</span> ▾</button>
+        <div class="dropdown-box" id="userDropdown">
+          <div class="dropdown-item" onclick="switchTab('tabStatement')">📜 Statement</div>
+          <div class="dropdown-item" onclick="openSelfPasswordModal()">🔑 Change Password</div>
+          <div class="dropdown-item" onclick="switchTab('tabTopPerformers')">🏆 <span id="menuTopTitle">Top Clients</span></div>
+          <div class="dropdown-item" onclick="switchTab('tabWeeklyReport')">📊 Weekly Report</div>
+          <div class="dropdown-item logout" onclick="adminLogout()">🚪 Logout</div>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="container">
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <h4 id="stat1Title">Total Managed Accounts</h4>
-        <div id="totalManagedCount">0</div>
-      </div>
-      <div class="stat-card">
-        <h4 id="stat2Title">Total Coins in Circulation</h4>
-        <div id="totalCoinsInCirculation" style="color: var(--text-gold);">0 C</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3 class="card-title" id="analysisTitle">Live Market Analysis (Active Predictions)</h3>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Market Index</th>
-              <th>Total Bets</th>
-              <th>Total Bet Coins</th>
-              <th>Andar (A) Coins</th>
-              <th>Bahar (B) Coins</th>
-              <th>Double Digit Coins</th>
-            </tr>
-          </thead>
-          <tbody id="marketAnalysisBody">
-            <tr><td colspan="6">Loading market analysis...</td></tr>
-          </tbody>
-        </table>
+    <!-- 1. MARKET ANALYSIS TAB -->
+    <div class="tab-content active" id="tabMarket">
+      <div class="card">
+        <h3 class="card-title">Live Market Analysis (Active Predictions)</h3>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Market Index</th>
+                <th>Total Bets</th>
+                <th>Total Bet Coins</th>
+                <th>Andar (A) Coins</th>
+                <th>Bahar (B) Coins</th>
+                <th>Double Digit Coins</th>
+              </tr>
+            </thead>
+            <tbody id="marketAnalysisBody">
+              <tr><td colspan="6">Loading market analysis...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <h3 class="card-title" id="createTitle">Create Account</h3>
-      <div class="form-grid">
-        <input type="text" id="newUsername" placeholder="Enter Username" autocomplete="off">
-        <input type="text" id="newPassword" placeholder="Enter Password" autocomplete="off">
-        <input type="number" id="newInitialCoins" placeholder="Initial Coins (Optional)">
-        <button class="btn-action" id="createBtn" type="button" onclick="handleCreateAccount(event)">CREATE</button>
+    <!-- 2. CLIENT / ADMIN LIST TAB -->
+    <div class="tab-content" id="tabAccounts">
+      <div class="card">
+        <h3 class="card-title" id="accountListCardTitle">Registered Client Accounts</h3>
+        <div style="overflow-x: auto;">
+          <table id="dataTable">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="5">Loading data...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <h3 class="card-title" id="tableTitle">Registered Accounts</h3>
-      <div style="overflow-x: auto;">
-        <table id="dataTable">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Balance</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <tr><td colspan="5">Loading data...</td></tr>
-          </tbody>
-        </table>
+    <!-- 3. CREATE ACCOUNT TAB -->
+    <div class="tab-content" id="tabCreate">
+      <div class="card">
+        <h3 class="card-title" id="createCardTitle">Create Client Account</h3>
+        <div class="form-grid">
+          <input type="text" id="newUsername" placeholder="Enter Username" autocomplete="off">
+          <input type="text" id="newPassword" placeholder="Enter Password" autocomplete="off">
+          <input type="number" id="newInitialCoins" placeholder="Initial Coins (Optional)">
+          <button class="btn-action" id="createBtn" type="button" onclick="handleCreateAccount(event)">CREATE ACCOUNT</button>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <h3 class="card-title" id="statementTitle">Statement History</h3>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Date & Time</th>
-              <th>Account</th>
-              <th>Type</th>
-              <th>Coins</th>
-              <th>Old Bal</th>
-              <th>New Bal</th>
-              <th>Remark</th>
-            </tr>
-          </thead>
-          <tbody id="statementBody">
-            <tr><td colspan="7">Loading logs...</td></tr>
-          </tbody>
-        </table>
+    <!-- 4. STATEMENT TAB -->
+    <div class="tab-content" id="tabStatement">
+      <div class="card">
+        <h3 class="card-title">Statement & Activity Ledger</h3>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Account</th>
+                <th>Type</th>
+                <th>Coins</th>
+                <th>Old Bal</th>
+                <th>New Bal</th>
+                <th>Remark</th>
+              </tr>
+            </thead>
+            <tbody id="statementBody">
+              <tr><td colspan="7">Loading logs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. TOP CLIENTS / TOP ADMINS TAB -->
+    <div class="tab-content" id="tabTopPerformers">
+      <div class="card">
+        <h3 class="card-title" id="topPerformersCardTitle">Top Performers Ranking</h3>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Wallet Balance</th>
+                <th>Net Performance / Settlement</th>
+              </tr>
+            </thead>
+            <tbody id="topPerformersBody">
+              <tr><td colspan="5">Loading ranking...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. WEEKLY REPORT TAB -->
+    <div class="tab-content" id="tabWeeklyReport">
+      <div class="card">
+        <h3 class="card-title">Weekly Performance Summary (Last 7 Days)</h3>
+        <div class="report-grid">
+          <div class="report-box">
+            <h4>Total Predictions Placed</h4>
+            <div id="repTotalBets" style="color:#ffb400;">0</div>
+          </div>
+          <div class="report-box">
+            <h4>Total Turnover Volume</h4>
+            <div id="repTotalVolume" style="color:#2ebd49;">0 C</div>
+          </div>
+          <div class="report-box">
+            <h4>Winning Predictions</h4>
+            <div id="repWinCount" style="color:#3fb950;">0</div>
+          </div>
+          <div class="report-box">
+            <h4>Losing Predictions</h4>
+            <div id="repLossCount" style="color:#f85149;">0</div>
+          </div>
+          <div class="report-box">
+            <h4>Pending Predictions</h4>
+            <div id="repPendingCount" style="color:#8b949e;">0</div>
+          </div>
+          <div class="report-box">
+            <h4>Net Upline Settlement</h4>
+            <div id="repUplinePnl" style="color:#ffffff;">0 C</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -165,9 +337,8 @@
       adminSession = JSON.parse(localStorage.getItem('durgaUser'));
     } catch(e) {}
 
-    // STRICT ROLE CHECK: Agar session missing hai YA role 'client' hai, turant bahar phenko
     if (!adminSession || !adminSession.username || (adminSession.role !== 'admin' && adminSession.role !== 'superadmin' && adminSession.username.toLowerCase() !== 'vikram16')) {
-      alert('Access Denied: You are not logged in as Admin!');
+      alert('Access Denied: Please login as Admin.');
       window.location.href = 'admin-login.html';
     }
 
@@ -178,62 +349,76 @@
       toast.innerText = message;
       toast.className = 'toast-box ' + (isSuccess ? 'toast-success' : 'toast-error');
       toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+      setTimeout(() => { toast.style.display = 'none'; }, 2500);
     }
+
+    function toggleUserDropdown() {
+      document.getElementById('userDropdown').classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      if(!e.target.closest('.user-menu-container')) {
+        document.getElementById('userDropdown').classList.remove('show');
+      }
+    });
 
     function adminLogout() {
       localStorage.removeItem('durgaUser');
       window.location.href = 'admin-login.html';
     }
 
+    function switchTab(tabId) {
+      document.getElementById('userDropdown').classList.remove('show');
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+      
+      if(tabId === 'tabMarket') document.getElementById('btnTabMarket').classList.add('active');
+      if(tabId === 'tabAccounts') document.getElementById('btnTabAccounts').classList.add('active');
+      if(tabId === 'tabCreate') document.getElementById('btnTabCreate').classList.add('active');
+
+      if(tabId === 'tabTopPerformers') loadTopPerformers();
+      if(tabId === 'tabWeeklyReport') loadWeeklyReport();
+      if(tabId === 'tabStatement') loadStatements();
+    }
+
     function setupPanelUI() {
-      document.getElementById('adminName').innerText = adminSession.username;
-      const roleBadge = document.getElementById('roleBadge');
+      document.getElementById('adminUsernameDisplay').innerText = adminSession.username;
 
       if (isSuperAdmin) {
-        roleBadge.innerText = 'SUPER ADMIN';
-        roleBadge.className = 'role-badge super-badge';
-        document.getElementById('adminBalContainer').style.display = 'none';
-        document.getElementById('stat1Title').innerText = 'Total Registered Admins';
-        document.getElementById('stat2Title').innerText = 'Total Coins Distributed to Admins';
-        document.getElementById('analysisTitle').innerText = 'Market Analysis (All Sub-Admins Combined Total)';
-        document.getElementById('createTitle').innerText = 'Create New Admin';
+        document.getElementById('tabAccountsTitle').innerText = 'Admin List';
+        document.getElementById('tabCreateTitle').innerText = 'Create Admin';
+        document.getElementById('accountListCardTitle').innerText = 'Registered Admin Accounts';
+        document.getElementById('createCardTitle').innerText = 'Create New Admin Account';
         document.getElementById('createBtn').innerText = 'CREATE ADMIN';
-        document.getElementById('tableTitle').innerText = 'Admin List';
-        document.getElementById('statementTitle').innerText = 'Super Admin Master Statement';
+        document.getElementById('menuTopTitle').innerText = 'Top Admins';
+        document.getElementById('topPerformersCardTitle').innerText = 'Top Admin Rankings (Turnover & Settlement)';
       } else {
-        roleBadge.innerText = 'ADMIN';
-        roleBadge.className = 'role-badge admin-badge';
-        document.getElementById('adminBalContainer').style.display = 'inline';
-        document.getElementById('stat1Title').innerText = 'My Clients';
-        document.getElementById('stat2Title').innerText = 'Total Coins in Clients';
-        document.getElementById('analysisTitle').innerText = 'Market Analysis (My Clients Predictions)';
-        document.getElementById('createTitle').innerText = 'Create New User';
-        document.getElementById('createBtn').innerText = 'CREATE USER';
-        document.getElementById('tableTitle').innerText = 'My User List';
-        document.getElementById('statementTitle').innerText = 'My Statement & Transactions';
+        document.getElementById('tabAccountsTitle').innerText = 'Client List';
+        document.getElementById('tabCreateTitle').innerText = 'Create Client';
+        document.getElementById('accountListCardTitle').innerText = 'Registered Client Accounts';
+        document.getElementById('createCardTitle').innerText = 'Create New Client Account';
+        document.getElementById('createBtn').innerText = 'CREATE CLIENT';
+        document.getElementById('menuTopTitle').innerText = 'Top Clients';
+        document.getElementById('topPerformersCardTitle').innerText = 'Top Client Rankings';
       }
     }
 
     async function refreshAdminWallet() {
-      if (!isSuperAdmin) {
-        try {
-          const res = await fetch(`${BACKEND_URL}/api/auth/verify-session`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: adminSession.username, sessionToken: adminSession.sessionToken })
-          });
-          const data = await res.json();
-          if (data.valid) {
-            // Check if server still considers role as admin
-            if (data.role && data.role !== 'admin' && data.role !== 'superadmin' && adminSession.username.toLowerCase() !== 'vikram16') {
-              adminLogout();
-              return;
-            }
-            document.getElementById('adminBal').innerText = data.balance;
-          }
-        } catch(e){}
-      }
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/auth/verify-session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: adminSession.username, sessionToken: adminSession.sessionToken })
+        });
+        const data = await res.json();
+        if (data.valid) {
+          document.getElementById('headerBal').innerText = isSuperAdmin ? (data.totalBal || 0) : (data.balance || 0);
+          document.getElementById('headerUpline').innerText = data.upline !== undefined ? data.upline : 0;
+        }
+      } catch(e){}
     }
 
     async function handleCreateAccount(ev) {
@@ -254,7 +439,7 @@
       }
 
       btn.disabled = true;
-      btn.innerText = 'Processing...';
+      btn.innerText = 'Creating...';
 
       const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/create-admin` : `${BACKEND_URL}/api/admin/create-client`;
       const payload = isSuperAdmin ? {
@@ -285,14 +470,15 @@
           loadTableData();
           refreshAdminWallet();
           loadStatements();
+          switchTab('tabAccounts');
         } else {
           alert('Error: ' + (data.msg || 'Failed to create account'));
         }
       } catch (err) {
-        alert('Server connection error. Please verify Render backend is active.');
+        alert('Server connection error.');
       } finally {
         btn.disabled = false;
-        btn.innerText = isSuperAdmin ? 'CREATE ADMIN' : 'CREATE USER';
+        btn.innerText = isSuperAdmin ? 'CREATE ADMIN' : 'CREATE CLIENT';
       }
     }
 
@@ -327,13 +513,9 @@
         const res = await fetch(endpoint);
         const list = await res.json();
 
-        let totalCoins = 0;
         let html = '';
-
         if (Array.isArray(list) && list.length > 0) {
-          document.getElementById('totalManagedCount').innerText = list.length;
           list.forEach(item => {
-            totalCoins += (item.balance || 0);
             const statusBadge = item.isLocked ? '<span style="color:#f85149; font-weight:bold;">LOCKED</span>' : '<span style="color:#3fb950; font-weight:bold;">ACTIVE</span>';
             const lockBtnText = item.isLocked ? 'Unlock' : 'Lock';
             const lockBtnClass = item.isLocked ? 'btn-unlock' : 'btn-lock';
@@ -354,15 +536,52 @@
             `;
           });
         } else {
-          document.getElementById('totalManagedCount').innerText = '0';
           html = `<tr><td colspan="5" style="color:#8b949e;">No registered accounts found.</td></tr>`;
         }
-
-        document.getElementById('totalCoinsInCirculation').innerText = `${totalCoins} C`;
         document.getElementById('tableBody').innerHTML = html;
       } catch(e) {
         document.getElementById('tableBody').innerHTML = `<tr><td colspan="5">Error loading table.</td></tr>`;
       }
+    }
+
+    async function loadTopPerformers() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/top-performers/${adminSession.username}`);
+        const result = await res.json();
+
+        let html = '';
+        if (result && Array.isArray(result.data) && result.data.length > 0) {
+          result.data.forEach((u, index) => {
+            const perf = u.upline !== undefined ? `${u.upline} C` : `${u.balance} C`;
+            html += `
+              <tr>
+                <td><strong>#${index + 1}</strong></td>
+                <td><strong>${u.username}</strong></td>
+                <td><span style="color:#8b949e; text-transform:uppercase;">${u.role}</span></td>
+                <td style="color:#2ebd49; font-weight:bold;">${u.balance} C</td>
+                <td style="color:var(--text-gold); font-weight:bold;">${perf}</td>
+              </tr>
+            `;
+          });
+        } else {
+          html = `<tr><td colspan="5" style="color:#8b949e;">No ranking data available.</td></tr>`;
+        }
+        document.getElementById('topPerformersBody').innerHTML = html;
+      } catch(e){}
+    }
+
+    async function loadWeeklyReport() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/weekly-report/${adminSession.username}`);
+        const data = await res.json();
+
+        document.getElementById('repTotalBets').innerText = data.totalBets || 0;
+        document.getElementById('repTotalVolume').innerText = `${data.totalVolume || 0} C`;
+        document.getElementById('repWinCount').innerText = data.winCount || 0;
+        document.getElementById('repLossCount').innerText = data.lossCount || 0;
+        document.getElementById('repPendingCount').innerText = data.pendingCount || 0;
+        document.getElementById('repUplinePnl').innerText = `${data.netUplinePnl || 0} C`;
+      } catch(e){}
     }
 
     async function manageCoins(targetUsername, action) {
@@ -433,7 +652,7 @@
     }
 
     async function toggleAccountLock(targetUsername) {
-      if (!confirm(`Are you sure you want to change lock status for ${targetUsername}?`)) return;
+      if (!confirm(`Change lock status for ${targetUsername}?`)) return;
 
       const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/toggle-admin-lock` : `${BACKEND_URL}/api/admin/toggle-client-lock`;
       const payload = isSuperAdmin ? {
@@ -457,6 +676,29 @@
           loadStatements();
         } else {
           alert(data.msg || 'Error updating lock');
+        }
+      } catch(e) { alert('Server error'); }
+    }
+
+    async function openSelfPasswordModal() {
+      document.getElementById('userDropdown').classList.remove('show');
+      const oldPass = prompt('Enter Current Password:');
+      if (!oldPass) return;
+      const newPass = prompt('Enter New Password:');
+      if (!newPass) return;
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/client/change-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: adminSession.username, oldPassword: oldPass, newPassword: newPass })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Password updated! Please login again.');
+          adminLogout();
+        } else {
+          alert(data.msg || 'Error changing password');
         }
       } catch(e) { alert('Server error'); }
     }
@@ -494,8 +736,7 @@
     refreshAdminWallet();
     loadMarketAnalysis();
     loadTableData();
-    loadStatements();
-    setInterval(refreshAdminWallet, 5000);
+    setInterval(refreshAdminWallet, 4000);
     setInterval(loadMarketAnalysis, 8000);
     setInterval(loadTableData, 10000);
   </script>
