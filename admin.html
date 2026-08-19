@@ -960,7 +960,7 @@
       }
     }
 
-    // LOAD & DISPLAY CURRENT TIMINGS CLEARLY
+    // LOAD & DISPLAY CURRENT TIMINGS CLEARLY (WITH AUTO +10 MINS)
     async function loadMarketTimingsConfig() {
       try {
         const res = await fetch(`${BACKEND_URL}/api/market/timings`);
@@ -980,8 +980,8 @@
                 </div>
 
                 <div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;">
-                  <div class="timing-badge-time">🔒 Set: ${m.lockTime} - ${m.unlockTime} IST</div>
-                  <div style="font-size:10px; color:#00e676; font-weight:700;">⚡ Settle: ${m.settleTime} IST</div>
+                  <div class="timing-badge-time">🔒 Lock: ${m.lockTime} - ${m.unlockTime} IST</div>
+                  <div style="font-size:10px; color:#00e676; font-weight:700;">⚡ Settle (+10m): ${m.settleTime} IST</div>
                 </div>
               </div>
             `;
@@ -1005,15 +1005,15 @@
           <div style="background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.3); border-radius: 6px; padding: 8px; margin-bottom: 12px; text-align: left;">
             <div style="font-size: 11px; color: var(--text-gold); font-weight: 800; margin-bottom: 2px;">📌 Currently Active Schedule:</div>
             <div style="font-size: 12px; color: #fff;">• Lock Interval: <strong>${timing.lockTime}</strong> to <strong>${timing.unlockTime}</strong></div>
-            <div style="font-size: 12px; color: #00e676;">• Auto Settle Time: <strong>${timing.settleTime} IST</strong></div>
+            <div style="font-size: 12px; color: #00e676;">• Auto Settle Time: <strong>${timing.settleTime} IST</strong> (+10 min after unlock)</div>
           </div>
-          Update Lock Start & End Time below (Settlement will automatically set to <strong>+1 Minute</strong>):
+          Update Lock Start & End Time below (Settlement will automatically set to <strong>+10 Minutes</strong>):
         `,
         inputs: [
           { label: 'Lock Start Time (Kab se band hogi):', type: 'text', placeholder: 'e.g. 11:30 or 20:20', value: timing.lockTime },
           { label: 'Lock End / Unlock Time (Kab khulegi):', type: 'text', placeholder: 'e.g. 12:00 or 20:50', value: timing.unlockTime }
         ],
-        confirmBtnText: 'SAVE & AUTO COMPUTE',
+        confirmBtnText: 'SAVE & AUTO COMPUTE (+10m)',
         confirmBtnClass: 'dialog-btn-primary',
         onConfirm: async (values) => {
           const lockTime = values[0] ? values[0].trim() : '';
