@@ -27,7 +27,6 @@
       min-height: 100vh;
     }
 
-    /* FROSTED GLASS HEADER WITH 3D DEPTH */
     .admin-header {
       background: rgba(8, 12, 18, 0.85);
       backdrop-filter: blur(16px);
@@ -56,7 +55,6 @@
       text-shadow: 0 0 12px var(--gold-glow);
     }
 
-    /* 3D WHITE EMBOSSED BADGE BOX */
     .balance-badge-box {
       background: linear-gradient(145deg, #ffffff, #f0f3f6);
       color: #0b1017;
@@ -75,7 +73,6 @@
     .balance-badge-box strong { font-size: 12px; font-weight: 800; }
     .upline-text { color: #0d1117; font-style: italic; font-weight: 900; }
 
-    /* 3D PILL BUTTONS NAVBAR */
     .nav-bar-row {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -123,7 +120,6 @@
       box-shadow: 0 0 8px var(--gold-glow);
     }
 
-    /* GLASS DROPDOWN MENU */
     .dropdown-box {
       position: fixed;
       top: 86px;
@@ -156,7 +152,6 @@
     .dropdown-item:hover, .dropdown-item:active { background: rgba(255, 184, 0, 0.1); color: var(--text-gold); }
     .dropdown-item.logout { color: #ff5252; border-bottom: none; }
 
-    /* CONTAINER & GLASS CARDS */
     .container { padding: 12px; max-width: 1100px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -182,7 +177,6 @@
       letter-spacing: 0.3px;
     }
 
-    /* 3D GLASS MARKET MONITORING CARDS */
     .market-list { display: flex; flex-direction: column; gap: 10px; }
     .market-card {
       background: linear-gradient(135deg, rgba(22, 30, 42, 0.8) 0%, rgba(13, 18, 26, 0.85) 100%);
@@ -194,10 +188,6 @@
       align-items: center;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       transition: all 0.2s ease;
-    }
-    .market-card:hover {
-      border-color: rgba(255, 184, 0, 0.3);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
     }
     .market-left { display: flex; flex-direction: column; gap: 2px; min-width: 105px; }
     .market-name-row { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 800; color: #ffffff; }
@@ -213,7 +203,6 @@
     .change-green { color: var(--text-green); text-shadow: 0 0 8px rgba(0, 230, 118, 0.35); }
     .change-red { color: var(--text-red); text-shadow: 0 0 8px rgba(255, 61, 87, 0.35); }
 
-    /* 3D CLIENT CARD LIST UI */
     .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
     .filter-bar input {
       flex: 1;
@@ -297,7 +286,6 @@
     }
     .btn-action-pill:active { transform: translateY(1px); background: #081729; }
 
-    /* FORMS */
     .form-grid { display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
     .form-grid input {
       width: 100%;
@@ -325,7 +313,6 @@
     .btn-action:active { transform: translateY(1px); }
     .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* 3D REPORT TILES */
     .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
     .report-box {
       background: linear-gradient(145deg, rgba(20, 28, 38, 0.7), rgba(12, 16, 23, 0.85));
@@ -342,7 +329,7 @@
     th, td { border: 1px solid rgba(255, 255, 255, 0.08); padding: 8px; text-align: center; }
     th { background: rgba(14, 20, 28, 0.9); color: var(--text-gold); font-weight: 800; }
 
-    /* FROSTED MODAL */
+    /* LARGE MODAL (STATEMENT / BETS) */
     .modal-overlay {
       position: fixed;
       top:0; left:0; width:100%; height:100%;
@@ -367,6 +354,92 @@
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
     }
 
+    /* COMPACT POPUP MODAL (REPLACES DEVICE PROMPT/CONFIRM) */
+    .action-dialog-overlay {
+      position: fixed;
+      top:0; left:0; width:100%; height:100%;
+      background: rgba(2, 4, 8, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000000;
+      padding: 16px;
+    }
+    .action-dialog-card {
+      background: linear-gradient(145deg, rgba(22, 30, 42, 0.96), rgba(12, 17, 24, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 330px;
+      padding: 18px 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      text-align: center;
+      animation: dialogPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes dialogPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .dialog-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-gold);
+      margin: 0 0 8px 0;
+      letter-spacing: 0.3px;
+    }
+    .dialog-desc {
+      font-size: 12px;
+      color: #9ab0c4;
+      margin: 0 0 14px 0;
+      line-height: 1.4;
+    }
+    .dialog-input {
+      width: 100%;
+      padding: 11px 12px;
+      background: rgba(7, 10, 15, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-align: center;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    }
+    .dialog-input:focus { border-color: var(--text-gold); outline: none; }
+    .dialog-btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .dialog-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+    .dialog-btn-primary {
+      background: linear-gradient(180deg, #00c853 0%, #009624 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 200, 83, 0.35);
+    }
+    .dialog-btn-danger {
+      background: linear-gradient(180deg, #ff3d57 0%, #d50000 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(213, 0, 0, 0.35);
+    }
+    .dialog-btn-cancel {
+      background: rgba(255, 255, 255, 0.08);
+      color: #c4d1db;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     /* TOAST */
     .toast-box {
       position: fixed;
@@ -378,7 +451,7 @@
       font-weight: 800;
       font-size: 13px;
       color: #fff;
-      z-index: 1000000;
+      z-index: 10000001;
       display: none;
       box-shadow: 0 8px 24px rgba(0,0,0,0.7);
       text-align: center;
@@ -391,6 +464,21 @@
 <body>
 
   <div class="toast-box" id="customToast"></div>
+
+  <!-- IN-APP POPUP DIALOG (REPLACES BROWSER POPUP PROMPT) -->
+  <div class="action-dialog-overlay" id="actionDialogOverlay">
+    <div class="action-dialog-card">
+      <h3 class="dialog-title" id="dialogTitle">Dialog Title</h3>
+      <p class="dialog-desc" id="dialogDesc">Dialog Description</p>
+      
+      <div id="dialogInputsContainer"></div>
+
+      <div class="dialog-btn-group">
+        <button class="dialog-btn dialog-btn-cancel" onclick="closeActionDialog()">CANCEL</button>
+        <button class="dialog-btn dialog-btn-primary" id="dialogSubmitBtn">CONFIRM</button>
+      </div>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <div class="admin-header">
@@ -566,7 +654,7 @@
 
   </div>
 
-  <!-- MODAL -->
+  <!-- LARGE MODAL -->
   <div class="modal-overlay" id="userModalOverlay">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -596,7 +684,6 @@
     } catch(e) {}
 
     if (!adminSession || !adminSession.username || (adminSession.role !== 'admin' && adminSession.role !== 'superadmin' && adminSession.username.toLowerCase() !== 'vikram16')) {
-      alert('Access Denied: Please login as Admin.');
       window.location.href = 'admin-login.html';
     }
 
@@ -608,6 +695,45 @@
       toast.className = 'toast-box ' + (isSuccess ? 'toast-success' : 'toast-error');
       toast.style.display = 'block';
       setTimeout(() => { toast.style.display = 'none'; }, 2500);
+    }
+
+    // CUSTOM IN-APP DIALOG POPUP CONTROLLER
+    function openActionDialog({ title, desc, inputs = [], confirmBtnText = 'CONFIRM', confirmBtnClass = 'dialog-btn-primary', onConfirm }) {
+      const overlay = document.getElementById('actionDialogOverlay');
+      document.getElementById('dialogTitle').innerText = title;
+      document.getElementById('dialogDesc').innerText = desc;
+      
+      const container = document.getElementById('dialogInputsContainer');
+      container.innerHTML = '';
+      
+      inputs.forEach((inp, idx) => {
+        const inputEl = document.createElement('input');
+        inputEl.type = inp.type || 'text';
+        inputEl.placeholder = inp.placeholder || '';
+        inputEl.id = `dialog_inp_${idx}`;
+        inputEl.className = 'dialog-input';
+        if (inp.inputmode) inputEl.inputMode = inp.inputmode;
+        container.appendChild(inputEl);
+      });
+
+      const submitBtn = document.getElementById('dialogSubmitBtn');
+      submitBtn.innerText = confirmBtnText;
+      submitBtn.className = `dialog-btn ${confirmBtnClass}`;
+      
+      submitBtn.onclick = () => {
+        const values = inputs.map((_, idx) => document.getElementById(`dialog_inp_${idx}`) ? document.getElementById(`dialog_inp_${idx}`).value : null);
+        if (onConfirm) onConfirm(values);
+      };
+
+      overlay.style.display = 'flex';
+      setTimeout(() => {
+        const firstInp = document.getElementById('dialog_inp_0');
+        if (firstInp) firstInp.focus();
+      }, 100);
+    }
+
+    function closeActionDialog() {
+      document.getElementById('actionDialogOverlay').style.display = 'none';
     }
 
     function toggleUserDropdown(event) {
@@ -803,8 +929,7 @@
       const coins = Number(cInput.value) || 0;
 
       if (!username || !password) {
-        alert('Please fill both Username and Password!');
-        return;
+        return showToast('Please enter both Username and Password!', false);
       }
 
       btn.disabled = true;
@@ -840,10 +965,10 @@
           refreshAdminWallet();
           switchTab('tabAccounts');
         } else {
-          alert('Error: ' + (data.msg || 'Failed to create account'));
+          showToast(data.msg || 'Failed to create account', false);
         }
       } catch (err) {
-        alert('Server connection error.');
+        showToast('Server connection error.', false);
       } finally {
         btn.disabled = false;
         btn.innerText = isSuperAdmin ? 'CREATE ADMIN' : 'CREATE CLIENT';
@@ -966,6 +1091,133 @@
       renderAccountCards(filtered);
     }
 
+    // IN-APP POPUP FOR COIN DEPOSIT & WITHDRAW
+    function manageCoins(targetUsername, action) {
+      const isAdd = (action === 'add');
+      openActionDialog({
+        title: isAdd ? 'Bank Deposit' : 'Bank Withdraw',
+        desc: `Enter coins amount to ${isAdd ? 'DEPOSIT into' : 'WITHDRAW from'} <strong>${targetUsername}</strong>:`,
+        inputs: [{ type: 'number', placeholder: 'Enter coins amount (e.g. 500)', inputmode: 'numeric' }],
+        confirmBtnText: isAdd ? 'DEPOSIT COINS' : 'WITHDRAW COINS',
+        confirmBtnClass: isAdd ? 'dialog-btn-primary' : 'dialog-btn-danger',
+        onConfirm: async (values) => {
+          const coins = Number(values[0]);
+          if (!coins || isNaN(coins) || coins <= 0) {
+            return showToast('Please enter a valid coin amount!', false);
+          }
+
+          const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/update-coins` : `${BACKEND_URL}/api/admin/update-coins`;
+          const payload = isSuperAdmin ? {
+            superAdminUsername: adminSession.username,
+            adminUsername: targetUsername,
+            coins: coins,
+            action: action
+          } : {
+            adminUsername: adminSession.username,
+            userId: targetUsername,
+            coins: coins,
+            action: action
+          };
+
+          try {
+            const res = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+              closeActionDialog();
+              showToast(data.msg, true);
+              loadTableData();
+              refreshAdminWallet();
+            } else {
+              showToast(data.msg || 'Transaction error', false);
+            }
+          } catch(e) { showToast('Server communication error', false); }
+        }
+      });
+    }
+
+    // IN-APP POPUP FOR RESETTING CLIENT PASSWORD
+    function changeAccountPassword(targetUsername) {
+      openActionDialog({
+        title: 'Reset Password',
+        desc: `Enter new secure password for <strong>${targetUsername}</strong>:`,
+        inputs: [{ type: 'text', placeholder: 'Enter new password' }],
+        confirmBtnText: 'UPDATE PASSWORD',
+        confirmBtnClass: 'dialog-btn-primary',
+        onConfirm: async (values) => {
+          const newPass = values[0] ? values[0].trim() : '';
+          if (!newPass) return showToast('Password cannot be empty!', false);
+
+          const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/change-admin-password` : `${BACKEND_URL}/api/admin/change-client-password`;
+          const payload = isSuperAdmin ? {
+            superAdminUsername: adminSession.username,
+            adminUsername: targetUsername,
+            newPassword: newPass
+          } : {
+            adminUsername: adminSession.username,
+            clientUsername: targetUsername,
+            newPassword: newPass
+          };
+
+          try {
+            const res = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+              closeActionDialog();
+              showToast(`Password updated for ${targetUsername}!`, true);
+            } else {
+              showToast(data.msg || 'Error resetting password', false);
+            }
+          } catch(e) { showToast('Server error', false); }
+        }
+      });
+    }
+
+    // IN-APP POPUP FOR ADMIN SELF PASSWORD UPDATE
+    function openSelfPasswordModal() {
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.remove('show');
+
+      openActionDialog({
+        title: 'Change My Password',
+        desc: 'Enter your current password and new password:',
+        inputs: [
+          { type: 'password', placeholder: 'Current Password' },
+          { type: 'password', placeholder: 'New Password' }
+        ],
+        confirmBtnText: 'UPDATE PASSWORD',
+        confirmBtnClass: 'dialog-btn-primary',
+        onConfirm: async (values) => {
+          const oldPass = values[0] ? values[0].trim() : '';
+          const newPass = values[1] ? values[1].trim() : '';
+          if (!oldPass || !newPass) return showToast('Please fill all fields!', false);
+
+          try {
+            const res = await fetch(`${BACKEND_URL}/api/client/change-password`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username: adminSession.username, oldPassword: oldPass, newPassword: newPass })
+            });
+            const data = await res.json();
+            if (res.ok) {
+              closeActionDialog();
+              showToast('Password updated! Please login again.', true);
+              setTimeout(adminLogout, 1200);
+            } else {
+              showToast(data.msg || 'Error changing password', false);
+            }
+          } catch(e) { showToast('Server error', false); }
+        }
+      });
+    }
+
     async function toggleAccountStatusLock(targetUsername) {
       const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/toggle-admin-lock` : `${BACKEND_URL}/api/admin/toggle-client-lock`;
       const payload = isSuperAdmin ? { superAdminUsername: adminSession.username, adminUsername: targetUsername } : { adminUsername: adminSession.username, clientUsername: targetUsername };
@@ -976,8 +1228,8 @@
         if (res.ok) {
           showToast(data.msg, true);
           loadTableData();
-        } else { alert(data.msg || 'Error updating status lock'); }
-      } catch(e) { alert('Server error'); }
+        } else { showToast(data.msg || 'Error updating status lock', false); }
+      } catch(e) { showToast('Server error', false); }
     }
 
     async function toggleAccountBetLock(targetUsername) {
@@ -990,8 +1242,8 @@
         if (res.ok) {
           showToast(data.msg, true);
           loadTableData();
-        } else { alert(data.msg || 'Error updating bet lock'); }
-      } catch(e) { alert('Server error'); }
+        } else { showToast(data.msg || 'Error updating bet lock', false); }
+      } catch(e) { showToast('Server error', false); }
     }
 
     async function openClientStatement(username) {
@@ -1118,64 +1370,6 @@
         document.getElementById('repPendingCount').innerText = data.pendingCount || 0;
         document.getElementById('repUplinePnl').innerText = `${data.netUplinePnl || 0} C`;
       } catch(e){}
-    }
-
-    async function manageCoins(targetUsername, action) {
-      const amountPrompt = prompt(`Enter coins to ${action === 'add' ? 'DEPOSIT to' : 'WITHDRAW from'} ${targetUsername}:`);
-      if (!amountPrompt || isNaN(amountPrompt) || Number(amountPrompt) <= 0) return;
-
-      const coins = Number(amountPrompt);
-      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/update-coins` : `${BACKEND_URL}/api/admin/update-coins`;
-      const payload = isSuperAdmin ? { superAdminUsername: adminSession.username, adminUsername: targetUsername, coins: coins, action: action } : { adminUsername: adminSession.username, userId: targetUsername, coins: coins, action: action };
-
-      try {
-        const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const data = await res.json();
-        if (res.ok) {
-          showToast(data.msg, true);
-          loadTableData();
-          refreshAdminWallet();
-        } else { alert(data.msg || 'Transaction error'); }
-      } catch(e) { alert('Server error'); }
-    }
-
-    async function changeAccountPassword(targetUsername) {
-      const newPass = prompt(`Enter new password for ${targetUsername}:`);
-      if (!newPass) return;
-
-      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/change-admin-password` : `${BACKEND_URL}/api/admin/change-client-password`;
-      const payload = isSuperAdmin ? { superAdminUsername: adminSession.username, adminUsername: targetUsername, newPassword: newPass } : { adminUsername: adminSession.username, clientUsername: targetUsername, newPassword: newPass };
-
-      try {
-        const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const data = await res.json();
-        if (res.ok) {
-          showToast('Password updated successfully!', true);
-        } else { alert(data.msg || 'Error resetting password'); }
-      } catch(e) { alert('Server error'); }
-    }
-
-    async function openSelfPasswordModal() {
-      const dd = document.getElementById('userDropdown');
-      if (dd) dd.classList.remove('show');
-
-      const oldPass = prompt('Enter Current Password:');
-      if (!oldPass) return;
-      const newPass = prompt('Enter New Password:');
-      if (!newPass) return;
-
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/client/change-password`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: adminSession.username, oldPassword: oldPass, newPassword: newPass })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          alert('Password updated! Please login again.');
-          adminLogout();
-        } else { alert(data.msg || 'Error changing password'); }
-      } catch(e) { alert('Server error'); }
     }
 
     setupPanelUI();
