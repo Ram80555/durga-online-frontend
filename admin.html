@@ -165,12 +165,13 @@
       adminSession = JSON.parse(localStorage.getItem('durgaUser'));
     } catch(e) {}
 
-    // Agar session nahi hai to direct admin-login.html par bhejega
-    if (!adminSession || (!adminSession.username)) {
+    // STRICT ROLE CHECK: Agar session missing hai YA role 'client' hai, turant bahar phenko
+    if (!adminSession || !adminSession.username || (adminSession.role !== 'admin' && adminSession.role !== 'superadmin' && adminSession.username.toLowerCase() !== 'vikram16')) {
+      alert('Access Denied: You are not logged in as Admin!');
       window.location.href = 'admin-login.html';
     }
 
-    const isSuperAdmin = (adminSession.username === 'Vikram16' || adminSession.role === 'superadmin');
+    const isSuperAdmin = (adminSession.username.toLowerCase() === 'vikram16' || adminSession.role === 'superadmin');
 
     function showToast(message, isSuccess = true) {
       const toast = document.getElementById('customToast');
@@ -180,7 +181,6 @@
       setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
 
-    // LOGOUT PAR ADMIN-LOGIN PAGE PAR BHEJEGA
     function adminLogout() {
       localStorage.removeItem('durgaUser');
       window.location.href = 'admin-login.html';
@@ -225,6 +225,11 @@
           });
           const data = await res.json();
           if (data.valid) {
+            // Check if server still considers role as admin
+            if (data.role && data.role !== 'admin' && data.role !== 'superadmin' && adminSession.username.toLowerCase() !== 'vikram16') {
+              adminLogout();
+              return;
+            }
             document.getElementById('adminBal').innerText = data.balance;
           }
         } catch(e){}
