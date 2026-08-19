@@ -165,7 +165,8 @@
       adminSession = JSON.parse(localStorage.getItem('durgaUser'));
     } catch(e) {}
 
-    if (!adminSession || (adminSession.role !== 'admin' && adminSession.role !== 'superadmin' && adminSession.username !== 'Vikram16')) {
+    // Agar session nahi hai to login par bhejo, nahi to login rehne do
+    if (!adminSession || !adminSession.username) {
       window.location.href = 'login.html';
     }
 
@@ -282,7 +283,7 @@
           alert('Error: ' + (data.msg || 'Failed to create account'));
         }
       } catch (err) {
-        alert('Server connection error. Please verify Render backend is active.');
+        alert('Server connection error. Please verify backend is active.');
       } finally {
         btn.disabled = false;
         btn.innerText = isSuperAdmin ? 'CREATE ADMIN' : 'CREATE USER';
