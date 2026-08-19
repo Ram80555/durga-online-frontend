@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Durga Online - Prediction Panel</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -179,12 +179,12 @@
   </div>
 
   <script>
-    const MARKETS_CONFIG = [
-      { name: 'KOSPI', flag: '🇰🇷', sub: 'Korea Composite Index', defaultRate: '2,681.49', defaultChange: '-18.20 (-0.67%)', isPos: false, defaultSpark: [2700, 2695, 2690, 2685, 2680, 2681], lockTime: '11:30', unlockTime: '12:00', resultTime: '11:52' },
-      { name: 'HANG SENG', flag: '🇭🇰', sub: 'Hong Kong', defaultRate: '18,813.45', defaultChange: '+196.92 (+1.06%)', isPos: true, defaultSpark: [18600, 18650, 18700, 18780, 18813], lockTime: '13:15', unlockTime: '13:45', resultTime: '13:32' },
-      { name: 'SENSEX', flag: '🇮🇳', sub: 'India', defaultRate: '76,410.25', defaultChange: '+746.95 (+0.99%)', isPos: true, defaultSpark: [75800, 75900, 76100, 76350, 76410], lockTime: '15:00', unlockTime: '15:30', resultTime: '15:32' },
-      { name: 'DAX', flag: '🇩🇪', sub: 'Germany', defaultRate: '18,638.56', defaultChange: '+199.18 (+1.08%)', isPos: true, defaultSpark: [18450, 18500, 18580, 18610, 18638], lockTime: '21:30', unlockTime: '22:00', resultTime: '22:02' },
-      { name: 'DOW JONES', flag: '🇺🇸', sub: 'United States', defaultRate: '38,798.99', defaultChange: '+222.86 (+0.58%)', isPos: true, defaultSpark: [38550, 38620, 38700, 38750, 38798], lockTime: '01:30', unlockTime: '02:00', resultTime: '01:32' }
+    let MARKETS_CONFIG = [
+      { name: 'KOSPI', flag: '🇰🇷', sub: 'Korea Composite Index', defaultRate: '2,681.49', defaultChange: '-18.20 (-0.67%)', isPos: false, defaultSpark: [2700, 2695, 2690, 2685, 2680, 2681], lockTime: '11:30', unlockTime: '12:00', settleTime: '12:10' },
+      { name: 'HANG SENG', flag: '🇭🇰', sub: 'Hong Kong', defaultRate: '18,813.45', defaultChange: '+196.92 (+1.06%)', isPos: true, defaultSpark: [18600, 18650, 18700, 18780, 18813], lockTime: '13:15', unlockTime: '13:45', settleTime: '13:55' },
+      { name: 'SENSEX', flag: '🇮🇳', sub: 'India', defaultRate: '76,410.25', defaultChange: '+746.95 (+0.99%)', isPos: true, defaultSpark: [75800, 75900, 76100, 76350, 76410], lockTime: '15:00', unlockTime: '15:30', settleTime: '15:40' },
+      { name: 'DAX', flag: '🇩🇪', sub: 'Germany', defaultRate: '18,638.56', defaultChange: '+199.18 (+1.08%)', isPos: true, defaultSpark: [18450, 18500, 18580, 18610, 18638], lockTime: '21:30', unlockTime: '22:00', settleTime: '22:10' },
+      { name: 'DOW JONES', flag: '🇺🇸', sub: 'United States', defaultRate: '38,798.99', defaultChange: '+222.86 (+0.58%)', isPos: true, defaultSpark: [38550, 38620, 38700, 38750, 38798], lockTime: '01:30', unlockTime: '02:00', settleTime: '02:10' }
     ];
 
     let activeMarket = '';
@@ -199,7 +199,6 @@
       userSession = JSON.parse(localStorage.getItem('durgaUser'));
     } catch(e) {}
 
-    // CLIENT PAGE SECURITY: Agar koi logged in nahi hai ya koi Admin account hai, to login par bhejo
     if (!userSession || userSession.role === 'admin' || userSession.role === 'superadmin' || userSession.username.toLowerCase() === 'vikram16') {
       localStorage.removeItem('durgaUser');
       window.location.href = 'login.html';
@@ -258,9 +257,9 @@
       if (dayOfWeek === 0 || dayOfWeek === 6) return false;
 
       const curMins = istTime.getHours() * 60 + istTime.getMinutes();
-      const [lockH, lockM] = m.lockTime.split(':').map(Number);
+      const [lockH, lockM] = (m.lockTime || '11:30').split(':').map(Number);
       const lockMins = lockH * 60 + lockM;
-      const [unH, unM] = m.unlockTime.split(':').map(Number);
+      const [unH, unM] = (m.unlockTime || '12:00').split(':').map(Number);
       const unlockMins = unH * 60 + unM;
 
       if (lockMins < unlockMins) {
@@ -272,6 +271,24 @@
 
     async function fetchResults() {
       try {
+        // Fetch dynamic market timings configured by Super Admin
+        const resTimings = await fetch(`${BACKEND_URL}/api/market/timings`);
+        const serverTimings = await resTimings.json();
+        if (Array.isArray(serverTimings) && serverTimings.length > 0) {
+          MARKETS_CONFIG = serverTimings.map(s => ({
+            name: s.market,
+            flag: s.flag || '🌐',
+            sub: s.sub || '',
+            defaultRate: '0.00',
+            defaultChange: '+0.00 (0.00%)',
+            isPos: true,
+            defaultSpark: [100, 105, 102, 108, 106],
+            lockTime: s.lockTime,
+            unlockTime: s.unlockTime,
+            settleTime: s.settleTime
+          }));
+        }
+
         const res = await fetch(`${BACKEND_URL}/api/market/results`);
         const results = await res.json();
         const resMap = {};
@@ -281,11 +298,13 @@
 
         let topHtml = '';
         MARKETS_CONFIG.forEach(m => {
-          const r = resMap[m.name] || { doubleDigit: '--' };
+          const r = resMap[m.name];
+          // Show FROZEN closing doubleDigit if settled
+          const closingDigit = (r && r.doubleDigit && r.doubleDigit !== '--') ? r.doubleDigit : '--';
           topHtml += `
             <div class="res-card">
               <div class="res-title">${m.name}</div>
-              <div class="res-box">${r.doubleDigit || '--'}</div>
+              <div class="res-box">${closingDigit}</div>
               <div class="res-timer" id="timer-${m.name.replace(/\s+/g, '')}">--:--:--</div>
             </div>
           `;
@@ -305,19 +324,24 @@
       const istTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
 
       MARKETS_CONFIG.forEach(m => {
-        const [resH, resM] = m.resultTime.split(':').map(Number);
+        const [resH, resM] = (m.settleTime || m.resultTime || '12:10').split(':').map(Number);
         let target = new Date(istTime);
         target.setHours(resH, resM, 0, 0);
 
-        if (istTime > target) { target.setDate(target.getDate() + 1); }
+        if (istTime.getTime() >= target.getTime()) { 
+          target.setDate(target.getDate() + 1); 
+        }
+        
+        // Weekend check -> Next Monday
         while (target.getDay() === 0 || target.getDay() === 6) {
           target.setDate(target.getDate() + 1);
         }
 
-        const diff = target - istTime;
-        const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-        const min = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-        const sec = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+        const diff = Math.max(0, target.getTime() - istTime.getTime());
+        const totalSecs = Math.floor(diff / 1000);
+        const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
+        const min = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
+        const sec = Math.floor(totalSecs % 60).toString().padStart(2, '0');
 
         const el = document.getElementById(`timer-${m.name.replace(/\s+/g, '')}`);
         if(el) el.innerText = `Next in -${h}:${min}:${sec}`;
@@ -350,7 +374,7 @@
         const cleanId = m.name.replace(/\s+/g, '');
 
         html += `
-          <div class="market-card" onclick="${locked ? `showToast('Market Closed for ${m.name}. Reopens at ${m.unlockTime}', false)` : `selectMarket('${m.name}')`}">
+          <div class="market-card" onclick="${locked ? `showToast('Market Closed for ${m.name}. Reopens at ${m.unlockTime} IST', false)` : `selectMarket('${m.name}')`}">
             <div class="market-left">
               <div class="market-name-row">
                 <span class="flag-icon">${m.flag}</span>
