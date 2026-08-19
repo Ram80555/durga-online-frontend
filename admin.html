@@ -241,6 +241,7 @@
       margin-bottom: 12px;
     }
 
+    /* 3D GLASS MARKET MONITORING CARDS */
     .market-list { display: flex; flex-direction: column; gap: 10px; }
     .market-card {
       background: linear-gradient(135deg, rgba(22, 30, 42, 0.8) 0%, rgba(13, 18, 26, 0.85) 100%);
@@ -266,6 +267,32 @@
     .change-green { color: var(--text-green); text-shadow: 0 0 8px rgba(0, 230, 118, 0.35); }
     .change-red { color: var(--text-red); text-shadow: 0 0 8px rgba(255, 61, 87, 0.35); }
 
+    /* TIMINGS CONFIG CARDS */
+    .timing-card-item {
+      background: linear-gradient(135deg, rgba(22, 30, 42, 0.9), rgba(12, 17, 24, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .timing-card-item:hover { border-color: var(--text-gold); transform: translateY(-1px); }
+    .timing-badge-time {
+      background: rgba(255, 184, 0, 0.12);
+      color: var(--text-gold);
+      border: 1px solid rgba(255, 184, 0, 0.3);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* CLIENT CARDS */
     .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
     .filter-bar input {
       flex: 1;
@@ -426,6 +453,8 @@
     .dialog-title { font-size: 15px; font-weight: 800; color: var(--text-gold); margin: 0 0 8px 0; }
     .dialog-desc { font-size: 12px; color: #9ab0c4; margin: 0 0 14px 0; line-height: 1.4; }
     .dialog-desc strong { color: #ffffff; font-weight: 800; }
+    .dialog-input-group { text-align: left; margin-bottom: 8px; }
+    .dialog-input-label { font-size: 11px; font-weight: 700; color: var(--text-gold); margin-bottom: 3px; display: block; }
     .dialog-input {
       width: 100%;
       padding: 11px 12px;
@@ -435,11 +464,11 @@
       border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       text-align: center;
     }
     .dialog-input:focus { border-color: var(--text-gold); outline: none; }
-    .dialog-btn-group { display: flex; gap: 8px; margin-top: 6px; }
+    .dialog-btn-group { display: flex; gap: 8px; margin-top: 10px; }
     .dialog-btn {
       flex: 1;
       padding: 10px;
@@ -453,7 +482,7 @@
     .dialog-btn-danger { background: linear-gradient(180deg, #ff3d57 0%, #d50000 100%); color: #ffffff; }
     .dialog-btn-cancel { background: rgba(255, 255, 255, 0.08); color: #c4d1db; border: 1px solid rgba(255, 255, 255, 0.1); }
 
-    /* 10-SEC COUNTDOWN EMERGENCY POPUP */
+    /* 10-SEC COUNTDOWN */
     .countdown-overlay {
       position: fixed;
       top:0; left:0; width:100%; height:100%;
@@ -540,7 +569,7 @@
   <!-- 10-SEC COUNTDOWN WIPEOUT WARNING MODAL -->
   <div class="countdown-overlay" id="countdownOverlay">
     <div class="countdown-card">
-      <h3 style="color: #ff3d57; margin: 0; font-size: 17px; font-weight: 900; letter-spacing: 0.5px;">⚠️ SYSTEM WIPEOUT IN PROGRESS</h3>
+      <h3 style="color: #ff3d57; margin: 0; font-size: 17px; font-weight: 900;">⚠️ SYSTEM WIPEOUT IN PROGRESS</h3>
       <p style="font-size: 12px; color: #ffb4c0; margin: 8px 0 0 0;">All Admins, Clients, Bets, Statements & Database will be permanently deleted in:</p>
       
       <div class="countdown-timer-circle" id="countdownValue">10</div>
@@ -597,7 +626,10 @@
     <div class="dropdown-item" onclick="switchTab('tabTopPerformers')">🏆 <span id="menuTopTitle">Top Clients</span></div>
     <div class="dropdown-item" onclick="switchTab('tabWeeklyReport')">📊 Weekly Report</div>
     
-    <!-- CLEAR ALL DATA (ONLY FOR SUPER ADMIN) -->
+    <!-- SET BET LOCK (SUPER ADMIN ONLY) -->
+    <div class="dropdown-item" id="menuSetBetLock" style="display: none;" onclick="switchTab('tabSetBetLock')">⏱️ Set Bet Lock</div>
+    
+    <!-- CLEAR ALL DATA (SUPER ADMIN ONLY) -->
     <div class="dropdown-item danger-item" id="menuClearAllData" style="display: none;" onclick="initiateClearAllData()">⚠️ Clear All Data</div>
     
     <div class="dropdown-item logout" onclick="adminLogout()">🚪 Logout</div>
@@ -745,6 +777,15 @@
       </div>
     </div>
 
+    <!-- 8. SET BET LOCK TAB (SUPER ADMIN ONLY) -->
+    <div class="tab-content" id="tabSetBetLock">
+      <div class="card">
+        <h3 class="card-title">Configure Index Bet Lock & Settlement Duration (IST)</h3>
+        <p style="font-size: 12px; color: #8b949e; margin-top: -6px; margin-bottom: 12px;">Click on any market card below to view current timings and change lock duration.</p>
+        <div id="timingsConfigContainer">Loading market schedules...</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- LARGE MODAL -->
@@ -759,18 +800,11 @@
   </div>
 
   <script>
-    const MARKETS_CONFIG = [
-      { name: 'KOSPI', flag: '🇰🇷', sub: 'Korea Composite Index', defaultRate: '2,681.49', defaultChange: '-18.20 (-0.67%)', isPos: false, defaultSpark: [2700, 2695, 2690, 2685, 2680, 2681] },
-      { name: 'HANG SENG', flag: '🇭🇰', sub: 'Hong Kong', defaultRate: '18,813.45', defaultChange: '+196.92 (+1.06%)', isPos: true, defaultSpark: [18600, 18650, 18700, 18780, 18813] },
-      { name: 'SENSEX', flag: '🇮🇳', sub: 'India', defaultRate: '76,410.25', defaultChange: '+746.95 (+0.99%)', isPos: true, defaultSpark: [75800, 75900, 76100, 76350, 76410] },
-      { name: 'DAX', flag: '🇩🇪', sub: 'Germany', defaultRate: '18,638.56', defaultChange: '+199.18 (+1.08%)', isPos: true, defaultSpark: [18450, 18500, 18580, 18610, 18638] },
-      { name: 'DOW JONES', flag: '🇺🇸', sub: 'United States', defaultRate: '38,798.99', defaultChange: '+222.86 (+0.58%)', isPos: true, defaultSpark: [38550, 38620, 38700, 38750, 38798] }
-    ];
-
     let chartInstances = {};
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
     let adminSession = null;
     let allAccountsList = [];
+    let marketTimingsList = [];
     let wipeoutTimerInterval = null;
     let verifiedWipeoutPassword = null;
 
@@ -801,13 +835,23 @@
       container.innerHTML = '';
       
       inputs.forEach((inp, idx) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'dialog-input-group';
+        if (inp.label) {
+          const lbl = document.createElement('label');
+          lbl.className = 'dialog-input-label';
+          lbl.innerText = inp.label;
+          wrap.appendChild(lbl);
+        }
         const inputEl = document.createElement('input');
         inputEl.type = inp.type || 'text';
         inputEl.placeholder = inp.placeholder || '';
+        inputEl.value = inp.value || '';
         inputEl.id = `dialog_inp_${idx}`;
         inputEl.className = 'dialog-input';
         if (inp.inputmode) inputEl.inputMode = inp.inputmode;
-        container.appendChild(inputEl);
+        wrap.appendChild(inputEl);
+        container.appendChild(wrap);
       });
 
       const submitBtn = document.getElementById('dialogSubmitBtn');
@@ -880,6 +924,7 @@
       if(tabId === 'tabTopPerformers') loadTopPerformers();
       if(tabId === 'tabWeeklyReport') loadWeeklyReport();
       if(tabId === 'tabStatement') loadAdminSelfStatements();
+      if(tabId === 'tabSetBetLock') loadMarketTimingsConfig();
     }
 
     function setupPanelUI() {
@@ -897,7 +942,7 @@
         document.getElementById('menuTopTitle').innerText = 'Top Admins';
         document.getElementById('topPerformersCardTitle').innerText = 'Top Admin Rankings (Turnover & Settlement)';
         
-        // Show Clear All Data only to Superadmin
+        document.getElementById('menuSetBetLock').style.display = 'flex';
         document.getElementById('menuClearAllData').style.display = 'flex';
       } else {
         roleBadge.innerText = 'ADMIN';
@@ -910,11 +955,100 @@
         document.getElementById('menuTopTitle').innerText = 'Top Clients';
         document.getElementById('topPerformersCardTitle').innerText = 'Top Client Rankings';
 
+        document.getElementById('menuSetBetLock').style.display = 'none';
         document.getElementById('menuClearAllData').style.display = 'none';
       }
     }
 
-    // EMERGENCY: CLEAR ALL DATA WITH 10-SEC COUNTDOWN & ABORT
+    // LOAD & DISPLAY CURRENT TIMINGS CLEARLY
+    async function loadMarketTimingsConfig() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/market/timings`);
+        marketTimingsList = await res.json();
+        
+        let html = '';
+        if (Array.isArray(marketTimingsList) && marketTimingsList.length > 0) {
+          marketTimingsList.forEach(m => {
+            html += `
+              <div class="timing-card-item" onclick="openEditTimingModal('${m.market}')">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:18px;">${m.flag || '🌐'}</span>
+                  <div>
+                    <strong style="font-size:14px; color:#fff;">${m.market}</strong>
+                    <div style="font-size:10px; color:#7f92a4;">${m.sub || ''}</div>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;">
+                  <div class="timing-badge-time">🔒 Set: ${m.lockTime} - ${m.unlockTime} IST</div>
+                  <div style="font-size:10px; color:#00e676; font-weight:700;">⚡ Settle: ${m.settleTime} IST</div>
+                </div>
+              </div>
+            `;
+          });
+        } else {
+          html = `<p style="text-align:center; color:#7f92a4;">No market timings found.</p>`;
+        }
+        document.getElementById('timingsConfigContainer').innerHTML = html;
+      } catch(e){
+        document.getElementById('timingsConfigContainer').innerHTML = `<p style="text-align:center; color:#ff3d57;">Error loading timings.</p>`;
+      }
+    }
+
+    function openEditTimingModal(marketName) {
+      const timing = marketTimingsList.find(t => t.market === marketName);
+      if (!timing) return;
+
+      openActionDialog({
+        title: `Configure: ${marketName}`,
+        desc: `
+          <div style="background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.3); border-radius: 6px; padding: 8px; margin-bottom: 12px; text-align: left;">
+            <div style="font-size: 11px; color: var(--text-gold); font-weight: 800; margin-bottom: 2px;">📌 Currently Active Schedule:</div>
+            <div style="font-size: 12px; color: #fff;">• Lock Interval: <strong>${timing.lockTime}</strong> to <strong>${timing.unlockTime}</strong></div>
+            <div style="font-size: 12px; color: #00e676;">• Auto Settle Time: <strong>${timing.settleTime} IST</strong></div>
+          </div>
+          Update Lock Start & End Time below (Settlement will automatically set to <strong>+1 Minute</strong>):
+        `,
+        inputs: [
+          { label: 'Lock Start Time (Kab se band hogi):', type: 'text', placeholder: 'e.g. 11:30 or 20:20', value: timing.lockTime },
+          { label: 'Lock End / Unlock Time (Kab khulegi):', type: 'text', placeholder: 'e.g. 12:00 or 20:50', value: timing.unlockTime }
+        ],
+        confirmBtnText: 'SAVE & AUTO COMPUTE',
+        confirmBtnClass: 'dialog-btn-primary',
+        onConfirm: async (values) => {
+          const lockTime = values[0] ? values[0].trim() : '';
+          const unlockTime = values[1] ? values[1].trim() : '';
+
+          const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+          if (!timeRegex.test(lockTime) || !timeRegex.test(unlockTime)) {
+            return showToast('Please enter valid 24h format (HH:MM) e.g. 20:20', false);
+          }
+
+          try {
+            const res = await fetch(`${BACKEND_URL}/api/superadmin/set-market-timing`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                superAdminUsername: adminSession.username,
+                market: marketName,
+                lockTime,
+                unlockTime
+              })
+            });
+            const data = await res.json();
+            if (res.ok) {
+              closeActionDialog();
+              showToast(data.msg, true);
+              loadMarketTimingsConfig();
+            } else {
+              showToast(data.msg || 'Error saving timing', false);
+            }
+          } catch(e) { showToast('Server communication error', false); }
+        }
+      });
+    }
+
+    // EMERGENCY MASTER RESET
     function initiateClearAllData() {
       const dd = document.getElementById('userDropdown');
       if (dd) dd.classList.remove('show');
@@ -1012,6 +1146,10 @@
         if (Array.isArray(results)) {
           results.forEach(r => resMap[r.market] = r);
         }
+
+        const resTimings = await fetch(`${BACKEND_URL}/api/market/timings`);
+        marketTimingsList = await resTimings.json();
+
         renderHomeMarkets(resMap);
       } catch(e) {
         renderHomeMarkets({});
@@ -1020,22 +1158,31 @@
 
     function renderHomeMarkets(resMap = {}) {
       let html = '';
-      MARKETS_CONFIG.forEach(m => {
-        const serverData = resMap[m.name];
-        const rateStr = (serverData && serverData.closingValue !== '0.00') ? serverData.closingValue : m.defaultRate;
-        const isPos = serverData ? serverData.isPositive : m.isPos;
-        const changeStr = (serverData && serverData.change) ? `${serverData.change} (${serverData.percentChange})` : m.defaultChange;
+      const listToRender = (Array.isArray(marketTimingsList) && marketTimingsList.length > 0) ? marketTimingsList : [
+        { market: 'KOSPI', flag: '🇰🇷', sub: 'Korea Composite Index', defaultRate: '2,681.49', defaultChange: '-18.20 (-0.67%)' },
+        { market: 'HANG SENG', flag: '🇭🇰', sub: 'Hong Kong', defaultRate: '18,813.45', defaultChange: '+196.92 (+1.06%)' },
+        { market: 'SENSEX', flag: '🇮🇳', sub: 'India', defaultRate: '76,410.25', defaultChange: '+746.95 (+0.99%)' },
+        { market: 'DAX', flag: '🇩🇪', sub: 'Germany', defaultRate: '18,638.56', defaultChange: '+199.18 (+1.08%)' },
+        { market: 'DOW JONES', flag: '🇺🇸', sub: 'United States', defaultRate: '38,798.99', defaultChange: '+222.86 (+0.58%)' }
+      ];
+
+      listToRender.forEach(m => {
+        const mName = m.market || m.name;
+        const serverData = resMap[mName];
+        const rateStr = (serverData && serverData.closingValue !== '0.00') ? serverData.closingValue : (m.defaultRate || '0.00');
+        const isPos = serverData ? serverData.isPositive : (m.isPos !== undefined ? m.isPos : true);
+        const changeStr = (serverData && serverData.change) ? `${serverData.change} (${serverData.percentChange})` : (m.defaultChange || '+0.00');
         const colorClass = isPos ? 'change-green' : 'change-red';
-        const cleanId = m.name.replace(/\s+/g, '');
+        const cleanId = mName.replace(/\s+/g, '');
 
         html += `
           <div class="market-card">
             <div class="market-left">
               <div class="market-name-row">
-                <span class="flag-icon">${m.flag}</span>
-                <span>${m.name}</span>
+                <span class="flag-icon">${m.flag || '🌐'}</span>
+                <span>${mName}</span>
               </div>
-              <div class="market-subtext">${m.sub}</div>
+              <div class="market-subtext">${m.sub || ''}</div>
             </div>
 
             <div class="market-mid-graph">
@@ -1051,11 +1198,12 @@
       });
       document.getElementById('homeMarketsList').innerHTML = html;
 
-      MARKETS_CONFIG.forEach(m => {
-        const cleanId = m.name.replace(/\s+/g, '');
-        const serverData = resMap[m.name];
-        const sparkData = (serverData && serverData.sparkline && serverData.sparkline.length > 2) ? serverData.sparkline : m.defaultSpark;
-        const isPos = serverData ? serverData.isPositive : m.isPos;
+      listToRender.forEach(m => {
+        const mName = m.market || m.name;
+        const cleanId = mName.replace(/\s+/g, '');
+        const serverData = resMap[mName];
+        const sparkData = (serverData && serverData.sparkline && serverData.sparkline.length > 2) ? serverData.sparkline : [100, 105, 102, 108, 106];
+        const isPos = serverData ? serverData.isPositive : true;
         renderWaveChart(`admin-chart-${cleanId}`, sparkData, isPos);
       });
     }
