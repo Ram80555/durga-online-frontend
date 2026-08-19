@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Durga Online - Login</title>
+  <title>Durga Online - User Login</title>
   <style>
     :root {
       --bg: #090c10;
@@ -37,8 +37,13 @@
       color: var(--text-gold);
       font-size: 24px;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 6px;
       letter-spacing: 1px;
+    }
+    .sub-title {
+      color: #8b949e;
+      font-size: 13px;
+      margin-bottom: 20px;
     }
     input {
       width: 100%;
@@ -51,9 +56,7 @@
       font-size: 14px;
       outline: none;
     }
-    input:focus {
-      border-color: var(--text-gold);
-    }
+    input:focus { border-color: var(--text-gold); }
     .btn-login {
       width: 100%;
       padding: 12px;
@@ -65,15 +68,8 @@
       font-size: 15px;
       cursor: pointer;
       margin-top: 5px;
-      transition: 0.2s;
     }
-    .btn-login:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .btn-login:hover:not(:disabled) {
-      background: #2ea043;
-    }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
     .error-msg {
       color: #f85149;
       font-size: 13px;
@@ -86,25 +82,23 @@
 
   <div class="login-box">
     <div class="brand-title">DURGA ONLINE</div>
+    <div class="sub-title">Client Prediction Portal</div>
     
     <input type="text" id="usernameInput" placeholder="Enter Username" autocomplete="username">
     <input type="password" id="passwordInput" placeholder="Enter Password" autocomplete="current-password">
     
-    <button class="btn-login" id="loginBtn" onclick="handleLogin()">LOGIN</button>
+    <button class="btn-login" id="loginBtn" onclick="handleClientLogin()">LOGIN</button>
     <div class="error-msg" id="errorMsg"></div>
   </div>
 
   <script>
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
 
-    // Enter key support
     document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        handleLogin();
-      }
+      if (e.key === 'Enter') handleClientLogin();
     });
 
-    async function handleLogin() {
+    async function handleClientLogin() {
       const uInput = document.getElementById('usernameInput');
       const pInput = document.getElementById('passwordInput');
       const btn = document.getElementById('loginBtn');
@@ -129,19 +123,20 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
-        
         const data = await res.json();
 
         if (res.ok && data.user) {
-          // Store complete session data
-          localStorage.setItem('durgaUser', JSON.stringify(data.user));
-
-          // Intelligent Role Redirect
-          if (data.user.role === 'superadmin' || data.user.role === 'admin' || data.user.username === 'Vikram16') {
-            window.location.href = 'admin.html';
-          } else {
-            window.location.href = 'index.html';
+          // Reject if Admin tries to login here
+          if (data.user.role === 'admin' || data.user.role === 'superadmin' || data.user.username.toLowerCase() === 'vikram16') {
+            err.innerText = 'Access Denied: Admins must login from the Admin Portal!';
+            err.style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = 'LOGIN';
+            return;
           }
+
+          localStorage.setItem('durgaUser', JSON.stringify(data.user));
+          window.location.href = 'index.html';
         } else {
           err.innerText = data.msg || 'Invalid Username or Password!';
           err.style.display = 'block';
@@ -149,7 +144,7 @@
           btn.innerText = 'LOGIN';
         }
       } catch (e) {
-        err.innerText = 'Server connection error. Please try again.';
+        err.innerText = 'Server error. Please try again.';
         err.style.display = 'block';
         btn.disabled = false;
         btn.innerText = 'LOGIN';
