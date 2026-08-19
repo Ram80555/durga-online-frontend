@@ -4,38 +4,122 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Durga Online - Login</title>
-  <link rel="stylesheet" href="style.css">
   <style>
-    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #121212; font-family: sans-serif; margin: 0; }
-    .login-card { width: 100%; max-width: 380px; padding: 25px; background: #1e1e1e; border-radius: 8px; border: 1px solid #333; color: white; box-sizing: border-box; }
-    input { width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
-    .btn-submit { width: 100%; padding: 12px; background: #28a745; border: none; font-weight: bold; color: white; border-radius: 4px; cursor: pointer; margin-top: 15px; }
+    :root {
+      --bg: #090c10;
+      --card-bg: #151a21;
+      --card-border: #21262d;
+      --text-gold: #ffb400;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: #e6edf3;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+    }
+    .login-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 30px 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    .brand-title {
+      color: var(--text-gold);
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus {
+      border-color: var(--text-gold);
+    }
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: #238636;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 5px;
+      transition: 0.2s;
+    }
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-login:hover:not(:disabled) {
+      background: #2ea043;
+    }
+    .error-msg {
+      color: #f85149;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <div class="login-card">
-    <h2 style="text-align: center; color: #ffb400; margin-bottom: 20px;">DURGA ONLINE</h2>
-    <input type="text" id="loginUser" placeholder="Username">
-    <input type="password" id="loginPass" placeholder="Password">
-    <button class="btn-submit" id="loginBtn" onclick="handleLogin()">LOGIN</button>
+
+  <div class="login-box">
+    <div class="brand-title">DURGA ONLINE</div>
+    
+    <input type="text" id="usernameInput" placeholder="Enter Username" autocomplete="username">
+    <input type="password" id="passwordInput" placeholder="Enter Password" autocomplete="current-password">
+    
+    <button class="btn-login" id="loginBtn" onclick="handleLogin()">LOGIN</button>
+    <div class="error-msg" id="errorMsg"></div>
   </div>
 
   <script>
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
 
+    // Enter key support
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        handleLogin();
+      }
+    });
+
     async function handleLogin() {
-      const username = document.getElementById('loginUser').value.trim();
-      const password = document.getElementById('loginPass').value.trim();
+      const uInput = document.getElementById('usernameInput');
+      const pInput = document.getElementById('passwordInput');
       const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('errorMsg');
 
-      if (!username || !password) return alert('Enter credentials');
+      const username = uInput.value.trim();
+      const password = pInput.value.trim();
 
-      if (username === 'Vikram16' && (password === 'Rajput8932@' || password === 'Rajput8932')) {
-        sessionStorage.setItem('durgaAdminLoggedIn', 'true');
-        window.location.href = 'admin.html';
+      if (!username || !password) {
+        err.innerText = 'Please enter both Username and Password!';
+        err.style.display = 'block';
         return;
       }
 
+      err.style.display = 'none';
       btn.disabled = true;
       btn.innerText = 'LOGGING IN...';
 
@@ -47,20 +131,26 @@
         });
         
         const data = await res.json();
-        
-        if (res.ok) {
+
+        if (res.ok && data.user) {
+          // Store complete session data
           localStorage.setItem('durgaUser', JSON.stringify(data.user));
-          if (data.user && data.user.role === 'admin') {
+
+          // Intelligent Role Redirect
+          if (data.user.role === 'superadmin' || data.user.role === 'admin' || data.user.username === 'Vikram16') {
             window.location.href = 'admin.html';
           } else {
             window.location.href = 'index.html';
           }
         } else {
-          alert(data.msg || data.message || 'Invalid Username or Password!');
+          err.innerText = data.msg || 'Invalid Username or Password!';
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.innerText = 'LOGIN';
         }
-      } catch (err) { 
-        alert('Server not responding. Please try again.'); 
-      } finally {
+      } catch (e) {
+        err.innerText = 'Server connection error. Please try again.';
+        err.style.display = 'block';
         btn.disabled = false;
         btn.innerText = 'LOGIN';
       }
