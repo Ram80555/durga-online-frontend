@@ -3,219 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DURGA ONLINE - GLOBAL ADMIN PANEL</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Durga Online - Admin Panel</title>
   <style>
     :root {
-      --header-bg: #0b0e14;
+      --bg: #090c10;
       --card-bg: #151a21;
+      --card-border: #21262d;
       --text-gold: #ffb400;
-      --body-bg: #090c10;
+      --text-green: #3fb950;
+      --text-red: #f85149;
     }
-    body { background-color: var(--body-bg); color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; }
-    
-    #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-    .login-card { background: #161b22; padding: 30px; border-radius: 8px; border: 1px solid #30363d; width: 90%; max-width: 360px; text-align: center; }
-    .login-card h2 { color: var(--text-gold); margin-bottom: 20px; font-size: 24px; }
-    .login-card input { width: 100%; padding: 12px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; box-sizing: border-box; }
-    .login-card button { width: 100%; padding: 12px; background: var(--text-gold); border: none; font-weight: bold; color: #000; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+    * { box-sizing: border-box; }
+    body { background: var(--bg); color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
 
-    .top-bar { background-color: var(--header-bg); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #21262d; }
-    .brand { font-size: 22px; font-weight: bold; color: var(--text-gold); }
-    .nav-links { display: flex; gap: 12px; align-items: center; }
-    .nav-item { color: #8b949e; font-size: 14px; font-weight: 600; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
-    .nav-item:hover, .nav-item.active { color: #fff; background: #21262d; }
-    .btn-logout { background: #da3633; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; margin-left: 10px; }
-    .btn-logout:hover { background: #b91c1c; }
-
-    .ticker { background: #161b22; color: #e3b341; padding: 6px 15px; font-size: 12px; border-bottom: 1px solid #21262d; }
+    .header { background: #161b22; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); }
+    .brand { font-size: 18px; font-weight: bold; color: var(--text-gold); }
+    .admin-info { font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 12px; }
+    .role-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+    .super-badge { background: #6e40c9; color: #fff; }
+    .admin-badge { background: #d97706; color: #fff; }
+    .btn-logout { background: #da3633; color: white; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
 
     .container { padding: 15px; max-width: 1100px; margin: 0 auto; }
-    .tab-section { display: none; }
-    .tab-section.active { display: block; }
-
-    .market-row { background: var(--card-bg); border: 1px solid #21262d; border-radius: 6px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .market-name { font-size: 16px; font-weight: bold; color: #fff; }
-    .market-rate { text-align: right; font-size: 18px; font-weight: bold; color: #fff; }
-
-    .user-block { background: #f4f5f7; color: #000; border-radius: 6px; padding: 12px; margin-bottom: 15px; }
-    .user-block-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid #ddd; }
-    .user-badge { background: #d97706; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
-    .metrics-row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 13px; font-weight: 600; text-align: center; }
-    .metrics-col { flex: 1; }
     
-    .btn-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-    .action-btn { background: #1e293b; color: #fff; border: 1px solid #334155; padding: 8px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; flex: 1 1 30%; text-align: center; text-transform: uppercase; }
-    .action-btn:hover { background: #334155; }
-    .btn-cr { background: #0284c7; color: white; flex: 0 0 auto; width: 35px; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; text-align: center; }
+    .stat-card h4 { margin: 0 0 6px 0; font-size: 12px; color: #8b949e; text-transform: uppercase; }
+    .stat-card div { font-size: 20px; font-weight: bold; color: #fff; }
 
-    .form-box { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid #21262d; margin-bottom: 15px; }
-    .form-box input { width: 100%; padding: 10px; margin: 8px 0; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; box-sizing: border-box; }
-    .btn-submit { background: #238636; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-    
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #30363d; padding: 10px; text-align: center; font-size: 13px; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; margin-bottom: 15px; }
+    .card-title { margin-top: 0; font-size: 16px; color: var(--text-gold); border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 12px; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+    input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 13px; }
+    .btn-action { background: #238636; color: white; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; width: 100%; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    th, td { border: 1px solid var(--card-border); padding: 8px 10px; text-align: center; }
     th { background: #161b22; color: var(--text-gold); }
-    .badge-type { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
-    .badge-green { background: #1b4721; color: #4ade80; }
-    .badge-red { background: #451a1a; color: #f87171; }
-    .badge-orange { background: #452a1a; color: #fb923c; }
+    
+    .btn-sm { padding: 4px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 11px; border: none; color: white; margin: 2px; }
+    .btn-deposit { background: #238636; }
+    .btn-withdraw { background: #da3633; }
+    .btn-pass { background: #1f6feb; }
+    .btn-lock { background: #8957e5; }
+    .btn-unlock { background: #2ea043; }
+
+    /* TOAST NOTIFICATION */
+    .toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #fff; z-index: 10000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.6); text-align: center; min-width: 250px; }
+    .toast-success { background: #1b4721; border: 1px solid #4ade80; color: #4ade80; }
+    .toast-error { background: #451a1a; border: 1px solid #f87171; color: #f87171; }
   </style>
 </head>
 <body>
 
-  <div id="loginOverlay">
-    <div class="login-card">
-      <h2>DURGA ONLINE</h2>
-      <p style="color:#8b949e; font-size: 13px; margin-bottom: 15px;">ADMIN PANEL LOGIN</p>
-      <input type="text" id="adminUser" placeholder="Username">
-      <input type="password" id="adminPass" placeholder="Password">
-      <button onclick="checkAdminLogin()">LOGIN</button>
-    </div>
-  </div>
+  <div class="toast-box" id="customToast"></div>
 
-  <div class="top-bar">
-    <div class="brand">
-      <span style="color:var(--text-gold)">☰ DURGA ONLINE ADMIN</span>
+  <div class="header">
+    <div class="brand">DURGA ONLINE - MANAGEMENT PANEL</div>
+    <div class="admin-info">
+      <span class="role-badge" id="roleBadge">ADMIN</span>
+      <span>User: <strong id="adminName">---</strong></span>
+      <span id="adminBalContainer" style="color: #3fb950; display: none;">Balance: <strong id="adminBal">0</strong> C</span>
+      <button class="btn-logout" onclick="adminLogout()">Logout</button>
     </div>
-    <div class="nav-links">
-      <span class="nav-item active" onclick="showTab('homeTab', this)">Home</span>
-      <span class="nav-item" onclick="showTab('marketTab', this)">Market</span>
-      <span class="nav-item" onclick="showTab('clientTab', this)">Client List</span>
-      <span class="nav-item" onclick="showTab('createTab', this)">Create Client</span>
-      <span class="nav-item" onclick="showTab('statementTab', this)">Statement</span>
-      <button class="btn-logout" onclick="adminLogout()">LOGOUT</button>
-    </div>
-  </div>
-
-  <div class="ticker">
-    🏆 GLOBAL CLOUD DATABASE ACTIVE | DURGA ONLINE ADMIN CONTROL
   </div>
 
   <div class="container">
 
-    <div id="homeTab" class="tab-section active">
-      <h3 style="color:var(--text-gold); margin-bottom: 15px; text-align:center;">Home — Live Index Rates</h3>
-      
-      <div class="market-row">
-        <div>
-          <div class="market-name">🇰🇷 KOSPI</div>
-          <div style="font-size:12px; color:#8b949e">Korea Composite Index</div>
-        </div>
-        <div class="market-rate">
-          2,681.49
-          <div style="color:#f85149; font-size:13px">-18.20 (-0.67%)</div>
-        </div>
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <h4 id="stat1Title">Total Managed Accounts</h4>
+        <div id="totalManagedCount">0</div>
       </div>
-
-      <div class="market-row">
-        <div>
-          <div class="market-name">🇭🇰 HANG SENG</div>
-          <div style="font-size:12px; color:#8b949e">Hong Kong</div>
-        </div>
-        <div class="market-rate">
-          18,813.45
-          <div style="color:#3fb950; font-size:13px">+196.92 (+1.06%)</div>
-        </div>
-      </div>
-
-      <div class="market-row">
-        <div>
-          <div class="market-name">🇮🇳 SENSEX</div>
-          <div style="font-size:12px; color:#8b949e">India</div>
-        </div>
-        <div class="market-rate">
-          76,410.25
-          <div style="color:#3fb950; font-size:13px">+746.95 (+0.99%)</div>
-        </div>
-      </div>
-
-      <div class="market-row">
-        <div>
-          <div class="market-name">🇩🇪 DAX</div>
-          <div style="font-size:12px; color:#8b949e">Germany</div>
-        </div>
-        <div class="market-rate">
-          18,638.56
-          <div style="color:#3fb950; font-size:13px">+199.18 (+1.08%)</div>
-        </div>
-      </div>
-
-      <div class="market-row">
-        <div>
-          <div class="market-name">🇺🇸 DOW JONES</div>
-          <div style="font-size:12px; color:#8b949e">United States</div>
-        </div>
-        <div class="market-rate">
-          38,798.99
-          <div style="color:#3fb950; font-size:13px">+222.86 (+0.58%)</div>
-        </div>
+      <div class="stat-card">
+        <h4 id="stat2Title">Total Coins in Circulation</h4>
+        <div id="totalCoinsInCirculation" style="color: var(--text-gold);">0 C</div>
       </div>
     </div>
 
-    <div id="marketTab" class="tab-section">
-      <h3 style="color:var(--text-gold); margin-bottom: 15px;">Market Total Predictions & Coins</h3>
-      <div class="form-box">
-        <label>Select Market Index:</label>
-        <select id="marketSelect" style="width:100%; padding:10px; background:#0d1117; color:#fff; border:1px solid #30363d; margin-top:5px;" onchange="renderMarketData()">
-          <option value="KOSPI">KOSPI</option>
-          <option value="HANG SENG">HANG SENG</option>
-          <option value="SENSEX">SENSEX</option>
-          <option value="DAX">DAX</option>
-          <option value="DOW JONES">DOW JONES</option>
-        </select>
-      </div>
-
-      <div class="form-box">
-        <h4>Single Digit Exposure (1:8)</h4>
+    <!-- LIVE MARKET ANALYSIS SECTION -->
+    <div class="card">
+      <h3 class="card-title" id="analysisTitle">Live Market Analysis (Active Predictions)</h3>
+      <div style="overflow-x: auto;">
         <table>
           <thead>
-            <tr><th>Digit</th><th>Total Coins Bet</th></tr>
+            <tr>
+              <th>Market Index</th>
+              <th>Total Bets</th>
+              <th>Total Bet Coins</th>
+              <th>Andar (A) Coins</th>
+              <th>Bahar (B) Coins</th>
+              <th>Double Digit Coins</th>
+            </tr>
           </thead>
-          <tbody id="singleDigitBody">
+          <tbody id="marketAnalysisBody">
+            <tr><td colspan="6">Loading market analysis...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <div id="clientTab" class="tab-section">
-      <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <input type="text" id="searchUser" placeholder="Search Username..." style="padding:10px; flex:1; background:#161b22; border:1px solid #30363d; color:#fff; border-radius:4px;" onkeyup="filterClients()">
-      </div>
-
-      <div id="clientsContainer">
-      </div>
-    </div>
-
-    <div id="createTab" class="tab-section">
-      <div class="form-box" style="max-width: 500px; margin: 0 auto;">
-        <h3 style="color:var(--text-gold); margin-bottom: 15px;">Create New Client Account</h3>
+    <!-- CREATE ACCOUNT SECTION (CREATE ADMIN vs CREATE USER) -->
+    <div class="card">
+      <h3 class="card-title" id="createTitle">Create Account</h3>
+      <div class="form-grid">
         <input type="text" id="newUsername" placeholder="Enter Username">
         <input type="password" id="newPassword" placeholder="Enter Password">
-        <input type="number" id="initialBalance" placeholder="Initial Deposit Coins (Optional)">
-        <button class="btn-submit" id="createBtn" onclick="createClient()">CREATE CLIENT</button>
+        <input type="number" id="newInitialCoins" placeholder="Initial Coins">
+        <button class="btn-action" id="createBtn" onclick="handleCreateAccount()">CREATE</button>
       </div>
     </div>
 
-    <!-- STATEMENT TAB -->
-    <div id="statementTab" class="tab-section">
-      <div class="form-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-          <h3 style="color:var(--text-gold); margin:0;">Global Activity & Financial Statements</h3>
-          <button onclick="loadStatements()" style="background:#21262d; color:#fff; border:1px solid #30363d; padding:6px 12px; border-radius:4px; cursor:pointer;">Refresh Statements</button>
-        </div>
+    <!-- ACCOUNTS LIST (ADMIN LIST vs USER LIST) -->
+    <div class="card">
+      <h3 class="card-title" id="tableTitle">Registered Accounts</h3>
+      <div style="overflow-x: auto;">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Balance</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="5">Loading data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STATEMENT LOGS (SUPER ADMIN vs NORMAL ADMIN) -->
+    <div class="card">
+      <h3 class="card-title" id="statementTitle">Statement History</h3>
+      <div style="overflow-x: auto;">
         <table>
           <thead>
             <tr>
               <th>Date & Time</th>
-              <th>Username</th>
-              <th>Activity Type</th>
+              <th>Account</th>
+              <th>Type</th>
               <th>Coins</th>
+              <th>Old Bal</th>
+              <th>New Bal</th>
               <th>Remark</th>
             </tr>
           </thead>
-          <tbody id="statementTableBody">
-            <tr><td colspan="5">Loading Statements...</td></tr>
+          <tbody id="statementBody">
+            <tr><td colspan="7">Loading logs...</td></tr>
           </tbody>
         </table>
       </div>
@@ -225,229 +164,322 @@
 
   <script>
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
-    let allClients = [];
+    let adminSession = JSON.parse(localStorage.getItem('durgaUser'));
 
-    function checkAdminLogin() {
-      const u = document.getElementById('adminUser').value.trim();
-      const p = document.getElementById('adminPass').value.trim();
-
-      if (u === 'Vikram16' && (p === 'Rajput8932@' || p === 'Rajput8932')) {
-        document.getElementById('loginOverlay').style.display = 'none';
-        sessionStorage.setItem('durgaAdminLoggedIn', 'true');
-        loadAdminData();
-      } else {
-        alert('Invalid Username or Password!');
-      }
+    if (!adminSession || (adminSession.role !== 'admin' && adminSession.role !== 'superadmin' && adminSession.username !== 'Vikram16')) {
+      window.location.href = 'login.html';
     }
 
-    if (sessionStorage.getItem('durgaAdminLoggedIn') === 'true') {
-      document.getElementById('loginOverlay').style.display = 'none';
-      window.onload = loadAdminData;
+    const isSuperAdmin = (adminSession.username === 'Vikram16' || adminSession.role === 'superadmin');
+
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('customToast');
+      toast.innerText = message;
+      toast.className = 'toast-box ' + (isSuccess ? 'toast-success' : 'toast-error');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 1800);
     }
 
     function adminLogout() {
-      if(confirm('Are you sure you want to Logout Admin Panel?')) {
-        sessionStorage.removeItem('durgaAdminLoggedIn');
-        window.location.href = 'login.html';
+      localStorage.removeItem('durgaUser');
+      window.location.href = 'login.html';
+    }
+
+    function setupPanelUI() {
+      document.getElementById('adminName').innerText = adminSession.username;
+      const roleBadge = document.getElementById('roleBadge');
+
+      if (isSuperAdmin) {
+        roleBadge.innerText = 'SUPER ADMIN';
+        roleBadge.className = 'role-badge super-badge';
+        document.getElementById('adminBalContainer').style.display = 'none'; // Super Admin balance is hidden
+        document.getElementById('stat1Title').innerText = 'Total Registered Admins';
+        document.getElementById('stat2Title').innerText = 'Total Coins Distributed to Admins';
+        document.getElementById('analysisTitle').innerText = 'Market Analysis (All Sub-Admins Combined Total)';
+        document.getElementById('createTitle').innerText = 'Create New Admin';
+        document.getElementById('createBtn').innerText = 'CREATE ADMIN';
+        document.getElementById('tableTitle').innerText = 'Admin List';
+        document.getElementById('statementTitle').innerText = 'Super Admin Master Statement';
+      } else {
+        roleBadge.innerText = 'ADMIN';
+        roleBadge.className = 'role-badge admin-badge';
+        document.getElementById('adminBalContainer').style.display = 'inline'; // Normal Admin shows balance
+        document.getElementById('stat1Title').innerText = 'My Clients';
+        document.getElementById('stat2Title').innerText = 'Total Coins in Clients';
+        document.getElementById('analysisTitle').innerText = 'Market Analysis (My Clients Predictions)';
+        document.getElementById('createTitle').innerText = 'Create New User';
+        document.getElementById('createBtn').innerText = 'CREATE USER';
+        document.getElementById('tableTitle').innerText = 'My User List';
+        document.getElementById('statementTitle').innerText = 'My Statement & Transactions';
       }
     }
 
-    function showTab(tabId, element) {
-      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      if(element) element.classList.add('active');
-
-      if (tabId === 'marketTab') renderMarketData();
-      if (tabId === 'clientTab') loadAdminData();
-      if (tabId === 'statementTab') loadStatements();
-    }
-
-    async function loadAdminData() {
-      const container = document.getElementById('clientsContainer');
-      container.innerHTML = '<div style="text-align:center; padding:20px; color:#ffb400;">Fetching database clients...</div>';
-
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/clients`);
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          allClients = data.filter(u => u.role !== 'admin');
-          renderClientsList(allClients);
-        } else {
-          container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients found in MongoDB.</div>';
-        }
-      } catch (err) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:#f85149;">Server connecting... Refresh in 5s.</div>';
+    async function refreshAdminWallet() {
+      if (!isSuperAdmin) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/auth/verify-session`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: adminSession.username, sessionToken: adminSession.sessionToken })
+          });
+          const data = await res.json();
+          if (data.valid) {
+            document.getElementById('adminBal').innerText = data.balance;
+          }
+        } catch(e){}
       }
     }
 
-    function renderClientsList(clients) {
-      const container = document.getElementById('clientsContainer');
-      if (!clients || clients.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:#8b949e;">No clients created yet.</div>';
-        return;
-      }
-
-      let html = '';
-      clients.forEach(c => {
-        html += `
-          <div class="user-block">
-            <div class="user-block-header">
-              <div><span class="user-badge">C</span> ${c.username}</div>
-              <div style="font-size: 16px;">
-                ${c.isLocked ? '🔒 LOCKED' : '🔓 ACTIVE'}
-              </div>
-            </div>
-            
-            <div class="metrics-row">
-              <div class="metrics-col">
-                <small style="color:#666; display:block;">BALANCE</small>
-                <span>${c.balance || 0}</span>
-              </div>
-              <div class="metrics-col">
-                <small style="color:#666; display:block;">P/L</small>
-                <span>${c.profitLoss || 0}</span>
-              </div>
-              <div class="metrics-col">
-                <small style="color:#666; display:block;">EXP</small>
-                <span>${c.exposure || 0}</span>
-              </div>
-            </div>
-
-            <div class="btn-grid">
-              <button class="action-btn btn-cr">CR</button>
-              <button class="action-btn" onclick="updateCoins('${c._id}', 'add')">BANK DEPOSIT</button>
-              <button class="action-btn" onclick="updateCoins('${c._id}', 'withdraw')">BANK WITHDRAW</button>
-              <button class="action-btn" onclick="viewStatement('${c.username}')">ACCOUNT STATEMENT</button>
-              <button class="action-btn" onclick="alert('No pending bets')">PENDING BETS</button>
-              <button class="action-btn" onclick="toggleLock('${c._id}')">${c.isLocked ? 'UNLOCK' : 'LOCK'} ACCOUNT</button>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
-
-    function filterClients() {
-      const q = document.getElementById('searchUser').value.toLowerCase();
-      const filtered = allClients.filter(c => c.username.toLowerCase().includes(q));
-      renderClientsList(filtered);
-    }
-
-    async function createClient() {
+    // CREATE ACCOUNT
+    async function handleCreateAccount() {
       const username = document.getElementById('newUsername').value.trim();
       const password = document.getElementById('newPassword').value.trim();
-      const coins = document.getElementById('initialBalance').value || 0;
-      const btn = document.getElementById('createBtn');
+      const coins = Number(document.getElementById('newInitialCoins').value) || 0;
 
-      if (!username || !password) return alert('Enter Username & Password');
+      if (!username || !password) return showToast('Enter username and password', false);
 
-      btn.disabled = true;
-      btn.innerText = 'SAVING CLIENT...';
+      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/create-admin` : `${BACKEND_URL}/api/admin/create-client`;
+      const payload = isSuperAdmin ? {
+        superAdminUsername: adminSession.username,
+        newAdminUsername: username,
+        password: password,
+        initialBalance: coins
+      } : {
+        adminUsername: adminSession.username,
+        username: username,
+        password: password,
+        initialBalance: coins
+      };
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/create-client`, {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, initialBalance: Number(coins) })
+          body: JSON.stringify(payload)
         });
         const data = await res.json();
-
         if (res.ok) {
-          alert(data.msg || `Client "${username}" Created Successfully!`);
+          showToast(data.msg, true);
           document.getElementById('newUsername').value = '';
           document.getElementById('newPassword').value = '';
-          document.getElementById('initialBalance').value = '';
-          const navItem = document.querySelectorAll('.nav-item')[2];
-          showTab('clientTab', navItem);
+          document.getElementById('newInitialCoins').value = '';
+          loadTableData();
+          refreshAdminWallet();
+          loadStatements();
         } else {
-          alert(data.msg || 'User creation failed');
+          showToast(data.msg || 'Error creating account', false);
         }
-      } catch (e) {
-        alert('Server connection error!');
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'CREATE CLIENT';
-      }
+      } catch (err) { showToast('Server connection error', false); }
     }
 
-    async function updateCoins(userId, action) {
-      const coins = prompt(`Enter coins to ${action}:`);
-      if (!coins || isNaN(coins)) return;
-
+    // LOAD MARKET ANALYSIS (AGGREGATED FOR SUPER ADMIN, OWN FOR ADMIN)
+    async function loadMarketAnalysis() {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/update-coins`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, coins: Number(coins), action })
+        const res = await fetch(`${BACKEND_URL}/api/admin/market-analysis/${adminSession.username}`);
+        const data = await res.json();
+
+        let html = '';
+        const markets = ['KOSPI', 'HANG SENG', 'SENSEX', 'DAX', 'DOW JONES'];
+
+        markets.forEach(m => {
+          const stats = data[m] || { totalBets: 0, totalCoins: 0, andarCoins: 0, baharCoins: 0, doubleCoins: 0 };
+          html += `
+            <tr>
+              <td><strong>${m}</strong></td>
+              <td>${stats.totalBets}</td>
+              <td style="color:var(--text-gold); font-weight:bold;">${stats.totalCoins} C</td>
+              <td>${stats.andarCoins} C</td>
+              <td>${stats.baharCoins} C</td>
+              <td>${stats.doubleCoins} C</td>
+            </tr>
+          `;
         });
-        const data = await res.json();
-        alert(data.msg || 'Wallet Updated Successfully!');
-        loadAdminData();
-      } catch (e) { alert('Backend Error!'); }
+        document.getElementById('marketAnalysisBody').innerHTML = html;
+      } catch(e){}
     }
 
-    async function toggleLock(userId) {
+    // LOAD ACCOUNTS TABLE (ADMIN LIST OR USER LIST)
+    async function loadTableData() {
+      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/admins` : `${BACKEND_URL}/api/admin/clients/${adminSession.username}`;
       try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/toggle-lock`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId })
-        });
-        const data = await res.json();
-        alert(data.msg || 'Lock status updated!');
-        loadAdminData();
-      } catch(e) { alert('Error updating lock status'); }
-    }
+        const res = await fetch(endpoint);
+        const list = await res.json();
 
-    // LOAD FINANCIAL AND ACTIVITY STATEMENTS
-    async function loadStatements() {
-      const tbody = document.getElementById('statementTableBody');
-      tbody.innerHTML = '<tr><td colspan="5">Fetching live statements...</td></tr>';
+        let totalCoins = 0;
+        let html = '';
 
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/statements`);
-        const data = await res.json();
-
-        if (Array.isArray(data) && data.length > 0) {
-          let html = '';
-          data.forEach(st => {
-            const dateStr = new Date(st.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-            let badgeClass = 'badge-green';
-            if (st.type.includes('WITHDRAW') || st.type.includes('LOCKED')) badgeClass = 'badge-red';
-            if (st.type.includes('CREATED')) badgeClass = 'badge-orange';
+        if (Array.isArray(list) && list.length > 0) {
+          document.getElementById('totalManagedCount').innerText = list.length;
+          list.forEach(item => {
+            totalCoins += (item.balance || 0);
+            const statusBadge = item.isLocked ? '<span style="color:#f85149; font-weight:bold;">LOCKED</span>' : '<span style="color:#3fb950; font-weight:bold;">ACTIVE</span>';
+            const lockBtnText = item.isLocked ? 'Unlock' : 'Lock';
+            const lockBtnClass = item.isLocked ? 'btn-unlock' : 'btn-lock';
 
             html += `
               <tr>
-                <td>${dateStr}</td>
-                <td><strong>${st.username}</strong></td>
-                <td><span class="badge-type ${badgeClass}">${st.type}</span></td>
-                <td><strong>${st.coins} C</strong></td>
-                <td style="color:#8b949e;">${st.remark}</td>
+                <td><strong>${item.username}</strong></td>
+                <td><span style="color:#8b949e; text-transform:uppercase;">${item.role}</span></td>
+                <td style="color:#2ebd49; font-weight:bold;">${item.balance} C</td>
+                <td>${statusBadge}</td>
+                <td>
+                  <button class="btn-sm btn-deposit" onclick="manageCoins('${item.username}', 'add')">+ Deposit</button>
+                  <button class="btn-sm btn-withdraw" onclick="manageCoins('${item.username}', 'withdraw')">- Withdraw</button>
+                  <button class="btn-sm btn-pass" onclick="changeAccountPassword('${item.username}')">Pass</button>
+                  <button class="btn-sm ${lockBtnClass}" onclick="toggleAccountLock('${item.username}')">${lockBtnText}</button>
+                </td>
               </tr>
             `;
           });
-          tbody.innerHTML = html;
         } else {
-          tbody.innerHTML = '<tr><td colspan="5">No statements recorded yet.</td></tr>';
+          document.getElementById('totalManagedCount').innerText = '0';
+          html = `<tr><td colspan="5" style="color:#8b949e;">No registered accounts found.</td></tr>`;
         }
-      } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="5" style="color:#f85149;">Error loading statements from server.</td></tr>';
+
+        document.getElementById('totalCoinsInCirculation').innerText = `${totalCoins} C`;
+        document.getElementById('tableBody').innerHTML = html;
+      } catch(e) {
+        document.getElementById('tableBody').innerHTML = `<tr><td colspan="5">Error loading table.</td></tr>`;
       }
     }
 
-    function viewStatement(username) {
-      showTab('statementTab', document.querySelectorAll('.nav-item')[4]);
+    // COINS ACTION (DEPOSIT / WITHDRAW)
+    async function manageCoins(targetUsername, action) {
+      const amountPrompt = prompt(`Enter coins to ${action === 'add' ? 'DEPOSIT to' : 'WITHDRAW from'} ${targetUsername}:`);
+      if (!amountPrompt || isNaN(amountPrompt) || Number(amountPrompt) <= 0) return;
+
+      const coins = Number(amountPrompt);
+      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/update-coins` : `${BACKEND_URL}/api/admin/update-coins`;
+      const payload = isSuperAdmin ? {
+        superAdminUsername: adminSession.username,
+        adminUsername: targetUsername,
+        coins: coins,
+        action: action
+      } : {
+        adminUsername: adminSession.username,
+        userId: targetUsername,
+        coins: coins,
+        action: action
+      };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg, true);
+          loadTableData();
+          refreshAdminWallet();
+          loadStatements();
+        } else {
+          showToast(data.msg || 'Transaction error', false);
+        }
+      } catch(e) { showToast('Server error', false); }
     }
 
-    function renderMarketData() {
-      const tbody = document.getElementById('singleDigitBody');
-      let html = '';
-      for (let i = 0; i <= 9; i++) {
-        html += `<tr><td><strong>Digit ${i}</strong></td><td>0 Coins</td></tr>`;
-      }
-      tbody.innerHTML = html;
+    // CHANGE PASSWORD FOR ADMIN OR USER
+    async function changeAccountPassword(targetUsername) {
+      const newPass = prompt(`Enter new password for ${targetUsername}:`);
+      if (!newPass) return;
+
+      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/change-admin-password` : `${BACKEND_URL}/api/admin/change-client-password`;
+      const payload = isSuperAdmin ? {
+        superAdminUsername: adminSession.username,
+        adminUsername: targetUsername,
+        newPassword: newPass
+      } : {
+        adminUsername: adminSession.username,
+        clientUsername: targetUsername,
+        newPassword: newPass
+      };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg, true);
+          loadStatements();
+        } else {
+          showToast(data.msg || 'Error resetting password', false);
+        }
+      } catch(e) { showToast('Server error', false); }
     }
+
+    // TOGGLE LOCK / UNLOCK
+    async function toggleAccountLock(targetUsername) {
+      if (!confirm(`Are you sure you want to change lock status for ${targetUsername}?`)) return;
+
+      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/toggle-admin-lock` : `${BACKEND_URL}/api/admin/toggle-client-lock`;
+      const payload = isSuperAdmin ? {
+        superAdminUsername: adminSession.username,
+        adminUsername: targetUsername
+      } : {
+        adminUsername: adminSession.username,
+        clientUsername: targetUsername
+      };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg, true);
+          loadTableData();
+          loadStatements();
+        } else {
+          showToast(data.msg || 'Error updating lock', false);
+        }
+      } catch(e) { showToast('Server error', false); }
+    }
+
+    // LOAD STATEMENTS
+    async function loadStatements() {
+      const endpoint = `${BACKEND_URL}/api/admin/statements/${adminSession.username}`;
+      try {
+        const res = await fetch(endpoint);
+        const logs = await res.json();
+
+        let html = '';
+        if (Array.isArray(logs) && logs.length > 0) {
+          logs.forEach(l => {
+            const dateStr = new Date(l.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            html += `
+              <tr>
+                <td>${dateStr}</td>
+                <td><strong>${l.username}</strong></td>
+                <td><span style="color:var(--text-gold);">${l.type}</span></td>
+                <td>${l.coins} C</td>
+                <td style="color:#8b949e;">${l.oldBalance !== undefined ? l.oldBalance : '-'} C</td>
+                <td style="color:#2ebd49; font-weight:bold;">${l.newBalance !== undefined ? l.newBalance : '-'} C</td>
+                <td style="color:#8b949e; text-align:left;">${l.remark}</td>
+              </tr>
+            `;
+          });
+        } else {
+          html = `<tr><td colspan="7" style="color:#8b949e;">No logs available.</td></tr>`;
+        }
+        document.getElementById('statementBody').innerHTML = html;
+      } catch(e){}
+    }
+
+    setupPanelUI();
+    refreshAdminWallet();
+    loadMarketAnalysis();
+    loadTableData();
+    loadStatements();
+    setInterval(refreshAdminWallet, 5000);
+    setInterval(loadMarketAnalysis, 8000);
+    setInterval(loadTableData, 10000);
   </script>
 </body>
 </html>
