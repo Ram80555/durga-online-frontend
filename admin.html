@@ -133,7 +133,6 @@
     .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; margin-bottom: 15px; }
     .card-title { margin-top: 0; font-size: 15px; color: var(--text-gold); border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 12px; }
 
-    /* SEARCH FILTER BAR */
     .filter-bar {
       display: flex;
       gap: 8px;
@@ -150,7 +149,7 @@
       font-size: 13px;
     }
 
-    /* CARD-BASED CLIENT LIST UI (MATCHING ATTACHED IMAGE) */
+    /* CARD-BASED CLIENT LIST UI */
     .client-card-item {
       background: #ffffff;
       color: #000000;
@@ -198,15 +197,24 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .lock-icon-btn {
+
+    /* COLORED SVG LOCK BUTTONS */
+    .lock-toggle-btn {
       background: none;
       border: none;
-      font-size: 16px;
       cursor: pointer;
-      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px;
+      border-radius: 4px;
+      transition: transform 0.1s ease;
     }
+    .lock-toggle-btn:active { transform: scale(0.9); }
+    .lock-icon-svg { width: 19px; height: 19px; }
+    .lock-green { color: #238636; fill: #238636; }
+    .lock-red { color: #da3633; fill: #da3633; }
 
-    /* CLIENT ACTION BUTTONS STRIP */
     .client-actions-strip {
       padding: 8px 10px;
       display: flex;
@@ -226,9 +234,7 @@
       letter-spacing: 0.3px;
       transition: 0.15s;
     }
-    .btn-action-pill:hover, .btn-action-pill:active {
-      background: #174275;
-    }
+    .btn-action-pill:hover, .btn-action-pill:active { background: #174275; }
 
     .form-grid { display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
     .form-grid input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 14px; }
@@ -244,7 +250,6 @@
     th, td { border: 1px solid var(--card-border); padding: 6px 8px; text-align: center; }
     th { background: #161b22; color: var(--text-gold); }
 
-    /* MODAL POPUP FOR SPECIFIC USER STATEMENT & BETS */
     .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:999999; padding: 10px; }
     .modal-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; width: 100%; max-width: 650px; max-height: 85vh; overflow-y: auto; padding: 16px; }
 
@@ -312,7 +317,7 @@
       </div>
     </div>
 
-    <!-- 2. CLIENT / ADMIN LIST TAB (CARD LAYOUT MATCHING IMAGE) -->
+    <!-- 2. CLIENT / ADMIN LIST TAB (CARD LAYOUT WITH COLORED LOCKS) -->
     <div class="tab-content" id="tabAccounts">
       <div class="card">
         <h3 class="card-title" id="accountListCardTitle">Registered Client Accounts</h3>
@@ -340,7 +345,7 @@
       </div>
     </div>
 
-    <!-- 4. ADMIN SELF STATEMENT TAB (ONLY DIRECT ADMIN LOGS) -->
+    <!-- 4. ADMIN SELF STATEMENT TAB -->
     <div class="tab-content" id="tabStatement">
       <div class="card">
         <h3 class="card-title">Admin Self Activity & Coin Distribution Ledger</h3>
@@ -620,7 +625,28 @@
       } catch(e){}
     }
 
-    // LOAD ACCOUNTS AS CARDS MATCHING ATTACHED IMAGE
+    // HELPER FUNCTIONS FOR RENDERING GREEN/RED PADLOCK ICONS
+    function getStatusLockIconSvg(isLocked) {
+      if (isLocked) {
+        // Red Closed Lock
+        return `<svg class="lock-icon-svg lock-red" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
+      } else {
+        // Green Open Lock
+        return `<svg class="lock-icon-svg lock-green" viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>`;
+      }
+    }
+
+    function getBetLockIconSvg(isBetLocked) {
+      if (isBetLocked) {
+        // Red Closed Lock
+        return `<svg class="lock-icon-svg lock-red" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
+      } else {
+        // Green Open Lock
+        return `<svg class="lock-icon-svg lock-green" viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>`;
+      }
+    }
+
+    // LOAD ACCOUNTS AS CARDS
     async function loadTableData() {
       const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/admins` : `${BACKEND_URL}/api/admin/clients/${adminSession.username}`;
       try {
@@ -643,9 +669,8 @@
       const badgeLetter = isSuperAdmin ? 'A' : 'C';
 
       list.forEach(item => {
-        const isLock = item.isLocked;
-        const lockIcon = isLock ? '🔒' : '🔓';
-        const lockColor = isLock ? '#da3633' : '#238636';
+        const isStatusLocked = !!item.isLocked;
+        const isBetLocked = !!item.isBetLocked;
 
         html += `
           <div class="client-card-item">
@@ -667,10 +692,14 @@
               <div style="color:${(item.upline || 0) >= 0 ? '#238636' : '#da3633'};">${item.upline || 0}</div>
               <div style="color:#da3633;">${item.exposure || 0}</div>
               <div>
-                <button class="lock-icon-btn" onclick="toggleAccountLock('${item.username}')" title="Click to Toggle Lock">${lockIcon}</button>
+                <button class="lock-toggle-btn" onclick="toggleAccountStatusLock('${item.username}')" title="Click to Toggle Login Status">
+                  ${getStatusLockIconSvg(isStatusLocked)}
+                </button>
               </div>
               <div>
-                <span style="color:${lockColor}; font-size:16px;">${lockIcon}</span>
+                <button class="lock-toggle-btn" onclick="toggleAccountBetLock('${item.username}')" title="Click to Toggle Betting Permission">
+                  ${getBetLockIconSvg(isBetLocked)}
+                </button>
               </div>
             </div>
 
@@ -693,7 +722,61 @@
       renderAccountCards(filtered);
     }
 
-    // OPEN SPECIFIC USER'S ACCOUNT STATEMENT MODAL
+    // TOGGLE STATUS LOCK (LOGIN RESTRICTION)
+    async function toggleAccountStatusLock(targetUsername) {
+      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/toggle-admin-lock` : `${BACKEND_URL}/api/admin/toggle-client-lock`;
+      const payload = isSuperAdmin ? {
+        superAdminUsername: adminSession.username,
+        adminUsername: targetUsername
+      } : {
+        adminUsername: adminSession.username,
+        clientUsername: targetUsername
+      };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg, true);
+          loadTableData();
+        } else {
+          alert(data.msg || 'Error updating status lock');
+        }
+      } catch(e) { alert('Server error'); }
+    }
+
+    // TOGGLE BET LOCK (BETTING RESTRICTION)
+    async function toggleAccountBetLock(targetUsername) {
+      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/toggle-admin-bet-lock` : `${BACKEND_URL}/api/admin/toggle-client-bet-lock`;
+      const payload = isSuperAdmin ? {
+        superAdminUsername: adminSession.username,
+        adminUsername: targetUsername
+      } : {
+        adminUsername: adminSession.username,
+        clientUsername: targetUsername
+      };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg, true);
+          loadTableData();
+        } else {
+          alert(data.msg || 'Error updating bet lock');
+        }
+      } catch(e) { alert('Server error'); }
+    }
+
+    // USER STATEMENT MODAL
     async function openClientStatement(username) {
       document.getElementById('userModalTitle').innerText = `Statement: ${username}`;
       document.getElementById('userModalContent').innerHTML = 'Loading statement...';
@@ -726,7 +809,7 @@
       } catch(e) { document.getElementById('userModalContent').innerHTML = 'Error loading user statement.'; }
     }
 
-    // OPEN SPECIFIC USER'S PENDING BETS MODAL
+    // PENDING BETS MODAL
     async function openClientPendingBets(username) {
       document.getElementById('userModalTitle').innerText = `Pending Bets: ${username}`;
       document.getElementById('userModalContent').innerHTML = 'Loading pending bets...';
@@ -754,7 +837,7 @@
       document.getElementById('userModalOverlay').style.display = 'none';
     }
 
-    // ADMIN SELF STATEMENT (Shows only Admin's own coin deposit/withdraw/creation logs)
+    // ADMIN SELF STATEMENT
     async function loadAdminSelfStatements() {
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/statements/${adminSession.username}`);
@@ -767,7 +850,7 @@
             html += `
               <tr>
                 <td>${dateStr}</td>
-                <td><span style="color:var(--text-gold); font-weight:bold;">${l.type}</span></td>
+                <td><span style="color:var(--text-gold);">${l.type}</span></td>
                 <td>${l.coins} C</td>
                 <td style="color:#8b949e;">${l.oldBalance !== undefined ? l.oldBalance : '-'} C</td>
                 <td style="color:#2ebd49; font-weight:bold;">${l.newBalance !== undefined ? l.newBalance : '-'} C</td>
@@ -883,34 +966,6 @@
           showToast('Password updated successfully!', true);
         } else {
           alert(data.msg || 'Error resetting password');
-        }
-      } catch(e) { alert('Server error'); }
-    }
-
-    async function toggleAccountLock(targetUsername) {
-      if (!confirm(`Change lock status for ${targetUsername}?`)) return;
-
-      const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/toggle-admin-lock` : `${BACKEND_URL}/api/admin/toggle-client-lock`;
-      const payload = isSuperAdmin ? {
-        superAdminUsername: adminSession.username,
-        adminUsername: targetUsername
-      } : {
-        adminUsername: adminSession.username,
-        clientUsername: targetUsername
-      };
-
-      try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showToast(data.msg, true);
-          loadTableData();
-        } else {
-          alert(data.msg || 'Error updating lock');
         }
       } catch(e) { alert('Server error'); }
     }
