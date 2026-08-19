@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Durga Online - Admin Management Panel</title>
   <style>
     :root {
@@ -16,92 +16,101 @@
     * { box-sizing: border-box; }
     body { background: var(--bg); color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
 
+    /* PROFESSIONAL MOBILE-RESPONSIVE HEADER */
     .admin-header {
       background: #000000;
-      padding: 8px 16px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-bottom: 2px solid #21262d;
+    }
+    .header-top-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #21262d;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      width: 100%;
     }
     .brand-logo {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 900;
       color: #ffb400;
       letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
+    /* COMPACT WHITE BAL & UPLINE BOX */
     .balance-badge-box {
       background: #ffffff;
       color: #000000;
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 4px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      font-size: 12px;
-      line-height: 1.35;
+      font-size: 11px;
+      line-height: 1.3;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      min-width: 125px;
+      min-width: 105px;
+      text-align: right;
     }
-    .balance-badge-box strong { font-size: 13px; font-weight: 800; }
+    .balance-badge-box strong { font-size: 12px; font-weight: 800; }
     .upline-text { color: #000; font-style: italic; font-weight: 800; }
 
-    .header-right {
+    /* HORIZONTAL SCROLLABLE NAVIGATION STRIP */
+    .nav-bar-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
     }
+    .nav-bar-row::-webkit-scrollbar { display: none; }
+
     .nav-tab-btn {
-      background: transparent;
-      border: none;
+      background: #161b22;
+      border: 1px solid #30363d;
       color: #e6edf3;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       padding: 6px 10px;
       border-radius: 4px;
       transition: 0.2s;
+      flex-shrink: 0;
     }
     .nav-tab-btn:hover, .nav-tab-btn.active {
       background: #21262d;
+      border-color: var(--text-gold);
       color: var(--text-gold);
     }
 
-    .user-menu-container { position: relative; }
+    /* PROFILE DROPDOWN MENU */
+    .user-menu-container { position: relative; flex-shrink: 0; }
     .user-menu-btn {
-      background: #161b22;
+      background: #21262d;
       color: #fff;
-      border: 1px solid #30363d;
-      padding: 6px 12px;
+      border: 1px solid var(--text-gold);
+      padding: 6px 10px;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
     }
     .dropdown-box {
       position: absolute;
       right: 0;
-      top: 36px;
+      top: 34px;
       background: #161b22;
       border: 1px solid var(--card-border);
       border-radius: 6px;
       display: none;
       flex-direction: column;
-      width: 180px;
-      z-index: 1000;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.7);
+      width: 170px;
+      z-index: 2000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.85);
     }
     .dropdown-box.show { display: flex; }
     .dropdown-item {
@@ -118,28 +127,29 @@
     .dropdown-item:hover { background: #21262d; color: var(--text-gold); }
     .dropdown-item.logout { color: #f85149; border-bottom: none; }
 
-    .container { padding: 15px; max-width: 1100px; margin: 0 auto; }
+    /* CONTENT CONTAINERS */
+    .container { padding: 12px; max-width: 1100px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; margin-bottom: 15px; }
-    .card-title { margin-top: 0; font-size: 16px; color: var(--text-gold); border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 12px; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; margin-bottom: 15px; }
+    .card-title { margin-top: 0; font-size: 15px; color: var(--text-gold); border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 12px; }
 
-    .form-grid { display: flex; flex-direction: column; gap: 12px; max-width: 480px; }
+    .form-grid { display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
     .form-grid input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 14px; }
     .btn-action { background: #238636; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
     .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px; }
-    .report-box { background: #0d1117; border: 1px solid var(--card-border); border-radius: 6px; padding: 12px; text-align: center; }
-    .report-box h4 { margin: 0 0 6px 0; font-size: 11px; color: #8b949e; text-transform: uppercase; }
-    .report-box div { font-size: 18px; font-weight: bold; }
+    .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
+    .report-box { background: #0d1117; border: 1px solid var(--card-border); border-radius: 6px; padding: 10px; text-align: center; }
+    .report-box h4 { margin: 0 0 4px 0; font-size: 10px; color: #8b949e; text-transform: uppercase; }
+    .report-box div { font-size: 16px; font-weight: bold; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-    th, td { border: 1px solid var(--card-border); padding: 8px 10px; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+    th, td { border: 1px solid var(--card-border); padding: 6px 8px; text-align: center; white-space: nowrap; }
     th { background: #161b22; color: var(--text-gold); }
     
-    .btn-sm { padding: 4px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 11px; border: none; color: white; margin: 2px; }
+    .btn-sm { padding: 4px 6px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 10px; border: none; color: white; margin: 1px; }
     .btn-deposit { background: #238636; }
     .btn-withdraw { background: #da3633; }
     .btn-pass { background: #1f6feb; }
@@ -155,22 +165,24 @@
 
   <div class="toast-box" id="customToast"></div>
 
+  <!-- HEADER -->
   <div class="admin-header">
-    <div class="header-left">
-      <div class="brand-logo">🐯 DURGA ONLINE</div>
+    <div class="header-top-row">
+      <div class="brand-logo">DURGA ONLINE</div>
       
+      <!-- BAL & UPLINE BOX -->
       <div class="balance-badge-box">
         <div>Bal : <strong id="headerBal">0</strong></div>
         <div>Upline : <strong class="upline-text" id="headerUpline">0</strong></div>
       </div>
     </div>
 
-    <div class="header-right">
+    <!-- CLEAN HORIZONTAL NAVBAR -->
+    <div class="nav-bar-row">
       <button class="nav-tab-btn active" id="btnTabMarket" onclick="switchTab('tabMarket')">Market ▾</button>
       <button class="nav-tab-btn" id="btnTabAccounts" onclick="switchTab('tabAccounts')"><span id="tabAccountsTitle">Client List</span> ▾</button>
       <button class="nav-tab-btn" id="btnTabCreate" onclick="switchTab('tabCreate')"><span id="tabCreateTitle">Create Client</span></button>
 
-      <!-- UPDATED PROFILE DROPDOWN MENU -->
       <div class="user-menu-container">
         <button class="user-menu-btn" onclick="toggleUserDropdown()"><span id="adminUsernameDisplay">Admin</span> ▾</button>
         <div class="dropdown-box" id="userDropdown">
@@ -283,7 +295,7 @@
                 <th>Username</th>
                 <th>Role</th>
                 <th>Wallet Balance</th>
-                <th>Net Performance / Settlement</th>
+                <th>Net Performance</th>
               </tr>
             </thead>
             <tbody id="topPerformersBody">
@@ -300,27 +312,27 @@
         <h3 class="card-title">Weekly Performance Summary (Last 7 Days)</h3>
         <div class="report-grid">
           <div class="report-box">
-            <h4>Total Predictions Placed</h4>
+            <h4>Total Predictions</h4>
             <div id="repTotalBets" style="color:#ffb400;">0</div>
           </div>
           <div class="report-box">
-            <h4>Total Turnover Volume</h4>
+            <h4>Turnover Volume</h4>
             <div id="repTotalVolume" style="color:#2ebd49;">0 C</div>
           </div>
           <div class="report-box">
-            <h4>Winning Predictions</h4>
+            <h4>Winning</h4>
             <div id="repWinCount" style="color:#3fb950;">0</div>
           </div>
           <div class="report-box">
-            <h4>Losing Predictions</h4>
+            <h4>Losing</h4>
             <div id="repLossCount" style="color:#f85149;">0</div>
           </div>
           <div class="report-box">
-            <h4>Pending Predictions</h4>
+            <h4>Pending</h4>
             <div id="repPendingCount" style="color:#8b949e;">0</div>
           </div>
           <div class="report-box">
-            <h4>Net Upline Settlement</h4>
+            <h4>Net Upline P&L</h4>
             <div id="repUplinePnl" style="color:#ffffff;">0 C</div>
           </div>
         </div>
