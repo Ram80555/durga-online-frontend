@@ -98,7 +98,6 @@
       flex-shrink: 0;
     }
 
-    /* DROPDOWN POPUP OVERLAY FIX */
     .dropdown-box {
       position: fixed;
       top: 85px;
@@ -134,6 +133,103 @@
     .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; margin-bottom: 15px; }
     .card-title { margin-top: 0; font-size: 15px; color: var(--text-gold); border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 12px; }
 
+    /* SEARCH FILTER BAR */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .filter-bar input {
+      flex: 1;
+      padding: 8px 12px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    /* CARD-BASED CLIENT LIST UI (MATCHING ATTACHED IMAGE) */
+    .client-card-item {
+      background: #ffffff;
+      color: #000000;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    }
+    .client-header-row {
+      background: #d4a359;
+      color: #ffffff;
+      padding: 6px 10px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+      font-size: 10px;
+      font-weight: 800;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .client-data-row {
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+      align-items: center;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      border-bottom: 1px solid #e1e4e8;
+    }
+    .badge-c {
+      background: #c28b38;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      margin-right: 4px;
+    }
+    .username-cell {
+      display: flex;
+      align-items: center;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 800;
+      color: #111;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lock-icon-btn {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* CLIENT ACTION BUTTONS STRIP */
+    .client-actions-strip {
+      padding: 8px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      background: #f7f9fa;
+    }
+    .btn-action-pill {
+      background: #0d2847;
+      color: #ffffff;
+      border: none;
+      padding: 5px 9px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: 0.15s;
+    }
+    .btn-action-pill:hover, .btn-action-pill:active {
+      background: #174275;
+    }
+
     .form-grid { display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
     .form-grid input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 14px; }
     .btn-action { background: #238636; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
@@ -145,17 +241,14 @@
     .report-box div { font-size: 16px; font-weight: bold; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-    th, td { border: 1px solid var(--card-border); padding: 6px 8px; text-align: center; white-space: nowrap; }
+    th, td { border: 1px solid var(--card-border); padding: 6px 8px; text-align: center; }
     th { background: #161b22; color: var(--text-gold); }
-    
-    .btn-sm { padding: 4px 6px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 10px; border: none; color: white; margin: 1px; }
-    .btn-deposit { background: #238636; }
-    .btn-withdraw { background: #da3633; }
-    .btn-pass { background: #1f6feb; }
-    .btn-lock { background: #8957e5; }
-    .btn-unlock { background: #2ea043; }
 
-    .toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #fff; z-index: 100000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.6); text-align: center; min-width: 250px; }
+    /* MODAL POPUP FOR SPECIFIC USER STATEMENT & BETS */
+    .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:999999; padding: 10px; }
+    .modal-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; width: 100%; max-width: 650px; max-height: 85vh; overflow-y: auto; padding: 16px; }
+
+    .toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #fff; z-index: 1000000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.6); text-align: center; min-width: 250px; }
     .toast-success { background: #1b4721; border: 1px solid #4ade80; color: #4ade80; }
     .toast-error { background: #451a1a; border: 1px solid #f87171; color: #f87171; }
   </style>
@@ -219,25 +312,17 @@
       </div>
     </div>
 
-    <!-- 2. CLIENT / ADMIN LIST TAB -->
+    <!-- 2. CLIENT / ADMIN LIST TAB (CARD LAYOUT MATCHING IMAGE) -->
     <div class="tab-content" id="tabAccounts">
       <div class="card">
         <h3 class="card-title" id="accountListCardTitle">Registered Client Accounts</h3>
-        <div style="overflow-x: auto;">
-          <table id="dataTable">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Balance</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody">
-              <tr><td colspan="5">Loading data...</td></tr>
-            </tbody>
-          </table>
+        
+        <div class="filter-bar">
+          <input type="text" id="searchInput" placeholder="Search Username..." oninput="filterAccounts()">
+        </div>
+
+        <div id="accountsCardsContainer">
+          <p style="text-align:center; color:#8b949e;">Loading accounts...</p>
         </div>
       </div>
     </div>
@@ -255,16 +340,15 @@
       </div>
     </div>
 
-    <!-- 4. STATEMENT TAB -->
+    <!-- 4. ADMIN SELF STATEMENT TAB (ONLY DIRECT ADMIN LOGS) -->
     <div class="tab-content" id="tabStatement">
       <div class="card">
-        <h3 class="card-title">Statement & Activity Ledger</h3>
+        <h3 class="card-title">Admin Self Activity & Coin Distribution Ledger</h3>
         <div style="overflow-x: auto;">
           <table>
             <thead>
               <tr>
                 <th>Date & Time</th>
-                <th>Account</th>
                 <th>Type</th>
                 <th>Coins</th>
                 <th>Old Bal</th>
@@ -272,8 +356,8 @@
                 <th>Remark</th>
               </tr>
             </thead>
-            <tbody id="statementBody">
-              <tr><td colspan="7">Loading logs...</td></tr>
+            <tbody id="adminSelfStatementBody">
+              <tr><td colspan="6">Loading admin logs...</td></tr>
             </tbody>
           </table>
         </div>
@@ -338,9 +422,21 @@
 
   </div>
 
+  <!-- MODAL FOR USER SPECIFIC STATEMENT / BETS -->
+  <div class="modal-overlay" id="userModalOverlay">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="userModalTitle" style="color:var(--text-gold); margin:0; font-size: 15px;">User Info</h3>
+        <button onclick="closeUserModal()" style="background:#da3633; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-weight:bold;">X</button>
+      </div>
+      <div id="userModalContent" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
   <script>
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
     let adminSession = null;
+    let allAccountsList = [];
 
     try {
       adminSession = JSON.parse(localStorage.getItem('durgaUser'));
@@ -391,12 +487,15 @@
       if (target) target.classList.add('active');
       
       if(tabId === 'tabMarket') document.getElementById('btnTabMarket').classList.add('active');
-      if(tabId === 'tabAccounts') document.getElementById('btnTabAccounts').classList.add('active');
+      if(tabId === 'tabAccounts') {
+        document.getElementById('btnTabAccounts').classList.add('active');
+        loadTableData();
+      }
       if(tabId === 'tabCreate') document.getElementById('btnTabCreate').classList.add('active');
 
       if(tabId === 'tabTopPerformers') loadTopPerformers();
       if(tabId === 'tabWeeklyReport') loadWeeklyReport();
-      if(tabId === 'tabStatement') loadStatements();
+      if(tabId === 'tabStatement') loadAdminSelfStatements();
     }
 
     function setupPanelUI() {
@@ -484,7 +583,6 @@
           cInput.value = '';
           loadTableData();
           refreshAdminWallet();
-          loadStatements();
           switchTab('tabAccounts');
         } else {
           alert('Error: ' + (data.msg || 'Failed to create account'));
@@ -522,41 +620,166 @@
       } catch(e){}
     }
 
+    // LOAD ACCOUNTS AS CARDS MATCHING ATTACHED IMAGE
     async function loadTableData() {
       const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/admins` : `${BACKEND_URL}/api/admin/clients/${adminSession.username}`;
       try {
         const res = await fetch(endpoint);
-        const list = await res.json();
+        allAccountsList = await res.json();
+        renderAccountCards(allAccountsList);
+      } catch(e) {
+        document.getElementById('accountsCardsContainer').innerHTML = `<p style="color:#f85149; text-align:center;">Error loading accounts.</p>`;
+      }
+    }
 
-        let html = '';
-        if (Array.isArray(list) && list.length > 0) {
-          list.forEach(item => {
-            const statusBadge = item.isLocked ? '<span style="color:#f85149; font-weight:bold;">LOCKED</span>' : '<span style="color:#3fb950; font-weight:bold;">ACTIVE</span>';
-            const lockBtnText = item.isLocked ? 'Unlock' : 'Lock';
-            const lockBtnClass = item.isLocked ? 'btn-unlock' : 'btn-lock';
+    function renderAccountCards(list) {
+      const container = document.getElementById('accountsCardsContainer');
+      if (!Array.isArray(list) || list.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#8b949e; padding: 20px;">No registered accounts found.</p>`;
+        return;
+      }
 
+      let html = '';
+      const badgeLetter = isSuperAdmin ? 'A' : 'C';
+
+      list.forEach(item => {
+        const isLock = item.isLocked;
+        const lockIcon = isLock ? '🔒' : '🔓';
+        const lockColor = isLock ? '#da3633' : '#238636';
+
+        html += `
+          <div class="client-card-item">
+            <div class="client-header-row">
+              <div style="text-align:left;">USERNAME</div>
+              <div>BALANCE</div>
+              <div>P/L</div>
+              <div>EXP</div>
+              <div>STATUS</div>
+              <div>BET</div>
+            </div>
+
+            <div class="client-data-row">
+              <div class="username-cell">
+                <span class="badge-c">${badgeLetter}</span>
+                <span title="${item.username}">${item.username}</span>
+              </div>
+              <div style="color:#111;">${item.balance || 0}</div>
+              <div style="color:${(item.upline || 0) >= 0 ? '#238636' : '#da3633'};">${item.upline || 0}</div>
+              <div style="color:#da3633;">${item.exposure || 0}</div>
+              <div>
+                <button class="lock-icon-btn" onclick="toggleAccountLock('${item.username}')" title="Click to Toggle Lock">${lockIcon}</button>
+              </div>
+              <div>
+                <span style="color:${lockColor}; font-size:16px;">${lockIcon}</span>
+              </div>
+            </div>
+
+            <div class="client-actions-strip">
+              <button class="btn-action-pill" onclick="manageCoins('${item.username}', 'add')">BANK DEPOSIT</button>
+              <button class="btn-action-pill" onclick="manageCoins('${item.username}', 'withdraw')">BANK WITHDRAW</button>
+              <button class="btn-action-pill" onclick="openClientStatement('${item.username}')">ACCOUNT STATEMENT</button>
+              <button class="btn-action-pill" onclick="openClientPendingBets('${item.username}')">PENDING BETS</button>
+              <button class="btn-action-pill" onclick="changeAccountPassword('${item.username}')">RESET PASSWORD</button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function filterAccounts() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filtered = allAccountsList.filter(a => a.username.toLowerCase().includes(q));
+      renderAccountCards(filtered);
+    }
+
+    // OPEN SPECIFIC USER'S ACCOUNT STATEMENT MODAL
+    async function openClientStatement(username) {
+      document.getElementById('userModalTitle').innerText = `Statement: ${username}`;
+      document.getElementById('userModalContent').innerHTML = 'Loading statement...';
+      document.getElementById('userModalOverlay').style.display = 'flex';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/client/statements/${username}`);
+        const logs = await res.json();
+
+        if (Array.isArray(logs) && logs.length > 0) {
+          let html = `<table><thead><tr><th>Date & Time</th><th>Type</th><th>Coins</th><th>Old Bal</th><th>New Bal</th><th>Remark</th></tr></thead><tbody>`;
+          logs.forEach(l => {
+            const dateStr = new Date(l.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
             html += `
               <tr>
-                <td><strong>${item.username}</strong></td>
-                <td><span style="color:#8b949e; text-transform:uppercase;">${item.role}</span></td>
-                <td style="color:#2ebd49; font-weight:bold;">${item.balance} C</td>
-                <td>${statusBadge}</td>
-                <td>
-                  <button class="btn-sm btn-deposit" type="button" onclick="manageCoins('${item.username}', 'add')">+ Deposit</button>
-                  <button class="btn-sm btn-withdraw" type="button" onclick="manageCoins('${item.username}', 'withdraw')">- Withdraw</button>
-                  <button class="btn-sm btn-pass" type="button" onclick="changeAccountPassword('${item.username}')">Pass</button>
-                  <button class="btn-sm ${lockBtnClass}" type="button" onclick="toggleAccountLock('${item.username}')">${lockBtnText}</button>
-                </td>
+                <td>${dateStr}</td>
+                <td><span style="color:var(--text-gold);">${l.type}</span></td>
+                <td>${l.coins} C</td>
+                <td style="color:#8b949e;">${l.oldBalance !== undefined ? l.oldBalance : '-'} C</td>
+                <td style="color:#2ebd49; font-weight:bold;">${l.newBalance !== undefined ? l.newBalance : '-'} C</td>
+                <td style="color:#8b949e; text-align:left;">${l.remark}</td>
+              </tr>
+            `;
+          });
+          html += `</tbody></table>`;
+          document.getElementById('userModalContent').innerHTML = html;
+        } else {
+          document.getElementById('userModalContent').innerHTML = '<p style="text-align:center; color:#8b949e;">No statement entries found for this user.</p>';
+        }
+      } catch(e) { document.getElementById('userModalContent').innerHTML = 'Error loading user statement.'; }
+    }
+
+    // OPEN SPECIFIC USER'S PENDING BETS MODAL
+    async function openClientPendingBets(username) {
+      document.getElementById('userModalTitle').innerText = `Pending Bets: ${username}`;
+      document.getElementById('userModalContent').innerHTML = 'Loading pending bets...';
+      document.getElementById('userModalOverlay').style.display = 'flex';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/client/pending-bets/${username}`);
+        const bets = await res.json();
+
+        if (Array.isArray(bets) && bets.length > 0) {
+          let html = `<table><thead><tr><th>Date & Time</th><th>Market</th><th>Type</th><th>Digit</th><th>Coins</th></tr></thead><tbody>`;
+          bets.forEach(b => {
+            const dateStr = new Date(b.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            html += `<tr><td>${dateStr}</td><td><strong>${b.market}</strong></td><td>${b.type.toUpperCase()}</td><td><strong style="color:var(--text-gold);">${b.digit}</strong></td><td>${b.coins} C</td></tr>`;
+          });
+          html += `</tbody></table>`;
+          document.getElementById('userModalContent').innerHTML = html;
+        } else {
+          document.getElementById('userModalContent').innerHTML = '<p style="text-align:center; color:#8b949e;">No pending bets found for this user.</p>';
+        }
+      } catch(e) { document.getElementById('userModalContent').innerHTML = 'Error loading pending bets.'; }
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModalOverlay').style.display = 'none';
+    }
+
+    // ADMIN SELF STATEMENT (Shows only Admin's own coin deposit/withdraw/creation logs)
+    async function loadAdminSelfStatements() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/statements/${adminSession.username}`);
+        const logs = await res.json();
+
+        let html = '';
+        if (Array.isArray(logs) && logs.length > 0) {
+          logs.forEach(l => {
+            const dateStr = new Date(l.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            html += `
+              <tr>
+                <td>${dateStr}</td>
+                <td><span style="color:var(--text-gold); font-weight:bold;">${l.type}</span></td>
+                <td>${l.coins} C</td>
+                <td style="color:#8b949e;">${l.oldBalance !== undefined ? l.oldBalance : '-'} C</td>
+                <td style="color:#2ebd49; font-weight:bold;">${l.newBalance !== undefined ? l.newBalance : '-'} C</td>
+                <td style="color:#8b949e; text-align:left;">${l.remark}</td>
               </tr>
             `;
           });
         } else {
-          html = `<tr><td colspan="5" style="color:#8b949e;">No registered accounts found.</td></tr>`;
+          html = `<tr><td colspan="6" style="color:#8b949e;">No admin statement records found.</td></tr>`;
         }
-        document.getElementById('tableBody').innerHTML = html;
-      } catch(e) {
-        document.getElementById('tableBody').innerHTML = `<tr><td colspan="5">Error loading table.</td></tr>`;
-      }
+        document.getElementById('adminSelfStatementBody').innerHTML = html;
+      } catch(e){}
     }
 
     async function loadTopPerformers() {
@@ -628,7 +851,6 @@
           showToast(data.msg, true);
           loadTableData();
           refreshAdminWallet();
-          loadStatements();
         } else {
           alert(data.msg || 'Transaction error');
         }
@@ -658,8 +880,7 @@
         });
         const data = await res.json();
         if (res.ok) {
-          showToast(data.msg, true);
-          loadStatements();
+          showToast('Password updated successfully!', true);
         } else {
           alert(data.msg || 'Error resetting password');
         }
@@ -688,7 +909,6 @@
         if (res.ok) {
           showToast(data.msg, true);
           loadTableData();
-          loadStatements();
         } else {
           alert(data.msg || 'Error updating lock');
         }
@@ -720,42 +940,12 @@
       } catch(e) { alert('Server error'); }
     }
 
-    async function loadStatements() {
-      const endpoint = `${BACKEND_URL}/api/admin/statements/${adminSession.username}`;
-      try {
-        const res = await fetch(endpoint);
-        const logs = await res.json();
-
-        let html = '';
-        if (Array.isArray(logs) && logs.length > 0) {
-          logs.forEach(l => {
-            const dateStr = new Date(l.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-            html += `
-              <tr>
-                <td>${dateStr}</td>
-                <td><strong>${l.username}</strong></td>
-                <td><span style="color:var(--text-gold);">${l.type}</span></td>
-                <td>${l.coins} C</td>
-                <td style="color:#8b949e;">${l.oldBalance !== undefined ? l.oldBalance : '-'} C</td>
-                <td style="color:#2ebd49; font-weight:bold;">${l.newBalance !== undefined ? l.newBalance : '-'} C</td>
-                <td style="color:#8b949e; text-align:left;">${l.remark}</td>
-              </tr>
-            `;
-          });
-        } else {
-          html = `<tr><td colspan="7" style="color:#8b949e;">No logs available.</td></tr>`;
-        }
-        document.getElementById('statementBody').innerHTML = html;
-      } catch(e){}
-    }
-
     setupPanelUI();
     refreshAdminWallet();
     loadMarketAnalysis();
     loadTableData();
     setInterval(refreshAdminWallet, 4000);
     setInterval(loadMarketAnalysis, 8000);
-    setInterval(loadTableData, 10000);
   </script>
 </body>
 </html>
