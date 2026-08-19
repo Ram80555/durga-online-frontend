@@ -34,9 +34,9 @@
     .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; margin-bottom: 15px; }
     .card-title { margin-top: 0; font-size: 16px; color: var(--text-gold); border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 12px; }
 
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
-    input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 13px; }
-    .btn-action { background: #238636; color: white; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; width: 100%; }
+    .form-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .form-grid input { flex: 1; min-width: 180px; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 13px; }
+    .btn-action { background: #238636; color: white; border: none; padding: 10px 18px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; min-width: 140px; }
     .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
@@ -65,7 +65,7 @@
       <span class="role-badge" id="roleBadge">ADMIN</span>
       <span>User: <strong id="adminName">---</strong></span>
       <span id="adminBalContainer" style="color: #3fb950; display: none;">Balance: <strong id="adminBal">0</strong> C</span>
-      <button class="btn-logout" onclick="adminLogout()">Logout</button>
+      <button class="btn-logout" type="button" onclick="adminLogout()">Logout</button>
     </div>
   </div>
 
@@ -107,9 +107,9 @@
       <h3 class="card-title" id="createTitle">Create Account</h3>
       <div class="form-grid">
         <input type="text" id="newUsername" placeholder="Enter Username" autocomplete="off">
-        <input type="password" id="newPassword" placeholder="Enter Password" autocomplete="new-password">
+        <input type="text" id="newPassword" placeholder="Enter Password" autocomplete="off">
         <input type="number" id="newInitialCoins" placeholder="Initial Coins (Optional)">
-        <button class="btn-action" id="createBtn" onclick="handleCreateAccount()">CREATE</button>
+        <button class="btn-action" id="createBtn" type="button" onclick="handleCreateAccount(event)">CREATE</button>
       </div>
     </div>
 
@@ -159,7 +159,11 @@
 
   <script>
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
-    let adminSession = JSON.parse(localStorage.getItem('durgaUser'));
+    let adminSession = null;
+
+    try {
+      adminSession = JSON.parse(localStorage.getItem('durgaUser'));
+    } catch(e) {}
 
     if (!adminSession || (adminSession.role !== 'admin' && adminSession.role !== 'superadmin' && adminSession.username !== 'Vikram16')) {
       window.location.href = 'login.html';
@@ -172,7 +176,7 @@
       toast.innerText = message;
       toast.className = 'toast-box ' + (isSuccess ? 'toast-success' : 'toast-error');
       toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 2500);
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
 
     function adminLogout() {
@@ -225,7 +229,9 @@
       }
     }
 
-    async function handleCreateAccount() {
+    async function handleCreateAccount(ev) {
+      if (ev) ev.preventDefault();
+
       const uInput = document.getElementById('newUsername');
       const pInput = document.getElementById('newPassword');
       const cInput = document.getElementById('newInitialCoins');
@@ -236,11 +242,12 @@
       const coins = Number(cInput.value) || 0;
 
       if (!username || !password) {
-        return showToast('Please enter both username and password!', false);
+        alert('Please fill both Username and Password!');
+        return;
       }
 
       btn.disabled = true;
-      btn.innerText = 'CREATING...';
+      btn.innerText = 'Processing...';
 
       const endpoint = isSuperAdmin ? `${BACKEND_URL}/api/superadmin/create-admin` : `${BACKEND_URL}/api/admin/create-client`;
       const payload = isSuperAdmin ? {
@@ -272,10 +279,10 @@
           refreshAdminWallet();
           loadStatements();
         } else {
-          showToast(data.msg || 'Error creating account', false);
+          alert('Error: ' + (data.msg || 'Failed to create account'));
         }
       } catch (err) {
-        showToast('Server connection error. Check backend status.', false);
+        alert('Server connection error. Please verify Render backend is active.');
       } finally {
         btn.disabled = false;
         btn.innerText = isSuperAdmin ? 'CREATE ADMIN' : 'CREATE USER';
@@ -331,10 +338,10 @@
                 <td style="color:#2ebd49; font-weight:bold;">${item.balance} C</td>
                 <td>${statusBadge}</td>
                 <td>
-                  <button class="btn-sm btn-deposit" onclick="manageCoins('${item.username}', 'add')">+ Deposit</button>
-                  <button class="btn-sm btn-withdraw" onclick="manageCoins('${item.username}', 'withdraw')">- Withdraw</button>
-                  <button class="btn-sm btn-pass" onclick="changeAccountPassword('${item.username}')">Pass</button>
-                  <button class="btn-sm ${lockBtnClass}" onclick="toggleAccountLock('${item.username}')">${lockBtnText}</button>
+                  <button class="btn-sm btn-deposit" type="button" onclick="manageCoins('${item.username}', 'add')">+ Deposit</button>
+                  <button class="btn-sm btn-withdraw" type="button" onclick="manageCoins('${item.username}', 'withdraw')">- Withdraw</button>
+                  <button class="btn-sm btn-pass" type="button" onclick="changeAccountPassword('${item.username}')">Pass</button>
+                  <button class="btn-sm ${lockBtnClass}" type="button" onclick="toggleAccountLock('${item.username}')">${lockBtnText}</button>
                 </td>
               </tr>
             `;
@@ -382,9 +389,9 @@
           refreshAdminWallet();
           loadStatements();
         } else {
-          showToast(data.msg || 'Transaction error', false);
+          alert(data.msg || 'Transaction error');
         }
-      } catch(e) { showToast('Server error', false); }
+      } catch(e) { alert('Server error'); }
     }
 
     async function changeAccountPassword(targetUsername) {
@@ -413,9 +420,9 @@
           showToast(data.msg, true);
           loadStatements();
         } else {
-          showToast(data.msg || 'Error resetting password', false);
+          alert(data.msg || 'Error resetting password');
         }
-      } catch(e) { showToast('Server error', false); }
+      } catch(e) { alert('Server error'); }
     }
 
     async function toggleAccountLock(targetUsername) {
@@ -442,9 +449,9 @@
           loadTableData();
           loadStatements();
         } else {
-          showToast(data.msg || 'Error updating lock', false);
+          alert(data.msg || 'Error updating lock');
         }
-      } catch(e) { showToast('Server error', false); }
+      } catch(e) { alert('Server error'); }
     }
 
     async function loadStatements() {
