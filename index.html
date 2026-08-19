@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Durga Online - Prediction Panel</title>
-  <!-- CHART.JS CDN FOR LIVE INTRADAY AREA GRAPH -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -40,7 +39,6 @@
 
     .container { padding: 10px; max-width: 1000px; margin: 0 auto; }
 
-    /* RESULTS GRID */
     .results-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
     @media (max-width: 600px) {
       .results-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
@@ -50,7 +48,6 @@
     .res-box { background: #0d1117; border: 1px solid var(--text-gold); color: var(--text-gold); border-radius: 4px; padding: 4px; font-size: 14px; font-weight: bold; display: block; margin: 2px 0; }
     .res-timer { font-size: 8px; color: #3fb950; font-weight: bold; margin-top: 1px; white-space: nowrap; }
 
-    /* GOOGLE FINANCE STYLE MARKET CARDS */
     .market-list { display: flex; flex-direction: column; gap: 8px; }
     .market-card { background: #13171f; border: 1px solid #21262d; border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
     .market-card:hover { border-color: #384252; background: #161b24; }
@@ -60,7 +57,6 @@
     .flag-icon { font-size: 16px; line-height: 1; }
     .market-subtext { font-size: 11px; color: #8b949e; margin-left: 22px; white-space: nowrap; }
 
-    /* REAL INTRADAY CANVAS GRAPH CONTAINER */
     .market-mid-graph { flex: 1; height: 38px; max-width: 130px; margin: 0 8px; position: relative; }
     .market-mid-graph canvas { width: 100% !important; height: 100% !important; }
 
@@ -197,9 +193,17 @@
     let chartInstances = {};
 
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
-    let userSession = JSON.parse(localStorage.getItem('durgaUser'));
+    let userSession = null;
 
-    if(!userSession) { window.location.href = 'login.html'; }
+    try {
+      userSession = JSON.parse(localStorage.getItem('durgaUser'));
+    } catch(e) {}
+
+    // CLIENT PAGE SECURITY: Agar koi logged in nahi hai ya koi Admin account hai, to login par bhejo
+    if (!userSession || userSession.role === 'admin' || userSession.role === 'superadmin' || userSession.username.toLowerCase() === 'vikram16') {
+      localStorage.removeItem('durgaUser');
+      window.location.href = 'login.html';
+    }
 
     function showToast(message, isSuccess = true) {
       const toast = document.getElementById('customToast');
@@ -275,7 +279,6 @@
           results.forEach(r => resMap[r.market] = r);
         }
 
-        // Render Top Result Cards
         let topHtml = '';
         MARKETS_CONFIG.forEach(m => {
           const r = resMap[m.name] || { doubleDigit: '--' };
@@ -290,7 +293,6 @@
         document.getElementById('resultsContainer').innerHTML = topHtml;
         updateTimers();
 
-        // Render Market List Cards & Live Wave Charts
         renderMarketsList(resMap);
       } catch(e){
         renderMarketsList({});
@@ -371,7 +373,6 @@
       });
       document.getElementById('marketListContainer').innerHTML = html;
 
-      // DRAW LIVE WAVE CHARTS WITH SHADED AREA GRADIENT
       MARKETS_CONFIG.forEach(m => {
         const cleanId = m.name.replace(/\s+/g, '');
         const serverData = resMap[m.name];
@@ -381,7 +382,6 @@
       });
     }
 
-    // REAL SHADED AREA CHART RENDERER (GOOGLE FINANCE STYLE)
     function renderWaveChart(canvasId, dataPoints, isPositive) {
       const ctx = document.getElementById(canvasId);
       if (!ctx) return;
@@ -403,7 +403,7 @@
             borderWidth: 1.8,
             fill: true,
             backgroundColor: bgColor,
-            tension: 0.35, // Smooth wave curve
+            tension: 0.35,
             pointRadius: 0,
             pointHoverRadius: 3,
             pointHoverBackgroundColor: lineColor
