@@ -165,9 +165,9 @@
       adminSession = JSON.parse(localStorage.getItem('durgaUser'));
     } catch(e) {}
 
-    // Agar session nahi hai to login par bhejo, nahi to login rehne do
-    if (!adminSession || !adminSession.username) {
-      window.location.href = 'login.html';
+    // Agar session nahi hai to direct admin-login.html par bhejega
+    if (!adminSession || (!adminSession.username)) {
+      window.location.href = 'admin-login.html';
     }
 
     const isSuperAdmin = (adminSession.username === 'Vikram16' || adminSession.role === 'superadmin');
@@ -180,9 +180,10 @@
       setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
 
+    // LOGOUT PAR ADMIN-LOGIN PAGE PAR BHEJEGA
     function adminLogout() {
       localStorage.removeItem('durgaUser');
-      window.location.href = 'login.html';
+      window.location.href = 'admin-login.html';
     }
 
     function setupPanelUI() {
@@ -283,7 +284,7 @@
           alert('Error: ' + (data.msg || 'Failed to create account'));
         }
       } catch (err) {
-        alert('Server connection error. Please verify backend is active.');
+        alert('Server connection error. Please verify Render backend is active.');
       } finally {
         btn.disabled = false;
         btn.innerText = isSuperAdmin ? 'CREATE ADMIN' : 'CREATE USER';
