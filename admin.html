@@ -16,7 +16,6 @@
     * { box-sizing: border-box; }
     body { background: var(--bg); color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
 
-    /* PROFESSIONAL MOBILE-RESPONSIVE HEADER */
     .admin-header {
       background: #000000;
       padding: 10px 12px;
@@ -24,6 +23,8 @@
       flex-direction: column;
       gap: 10px;
       border-bottom: 2px solid #21262d;
+      position: relative;
+      z-index: 100;
     }
     .header-top-row {
       display: flex;
@@ -38,7 +39,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* COMPACT WHITE BAL & UPLINE BOX */
     .balance-badge-box {
       background: #ffffff;
       color: #000000;
@@ -56,7 +56,6 @@
     .balance-badge-box strong { font-size: 12px; font-weight: 800; }
     .upline-text { color: #000; font-style: italic; font-weight: 800; }
 
-    /* HORIZONTAL SCROLLABLE NAVIGATION STRIP */
     .nav-bar-row {
       display: flex;
       align-items: center;
@@ -87,8 +86,6 @@
       color: var(--text-gold);
     }
 
-    /* PROFILE DROPDOWN MENU */
-    .user-menu-container { position: relative; flex-shrink: 0; }
     .user-menu-btn {
       background: #21262d;
       color: #fff;
@@ -98,24 +95,27 @@
       cursor: pointer;
       font-size: 12px;
       font-weight: bold;
+      flex-shrink: 0;
     }
+
+    /* DROPDOWN POPUP OVERLAY FIX */
     .dropdown-box {
-      position: absolute;
-      right: 0;
-      top: 34px;
+      position: fixed;
+      top: 85px;
+      right: 12px;
       background: #161b22;
-      border: 1px solid var(--card-border);
+      border: 1px solid #30363d;
       border-radius: 6px;
       display: none;
       flex-direction: column;
-      width: 170px;
-      z-index: 2000;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+      width: 180px;
+      z-index: 99999;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
     }
     .dropdown-box.show { display: flex; }
     .dropdown-item {
-      padding: 10px 12px;
-      font-size: 12px;
+      padding: 12px 14px;
+      font-size: 13px;
       color: #fff;
       cursor: pointer;
       border-bottom: 1px solid #21262d;
@@ -124,10 +124,9 @@
       align-items: center;
       gap: 8px;
     }
-    .dropdown-item:hover { background: #21262d; color: var(--text-gold); }
+    .dropdown-item:hover, .dropdown-item:active { background: #21262d; color: var(--text-gold); }
     .dropdown-item.logout { color: #f85149; border-bottom: none; }
 
-    /* CONTENT CONTAINERS */
     .container { padding: 12px; max-width: 1100px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -156,7 +155,7 @@
     .btn-lock { background: #8957e5; }
     .btn-unlock { background: #2ea043; }
 
-    .toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #fff; z-index: 10000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.6); text-align: center; min-width: 250px; }
+    .toast-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #fff; z-index: 100000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.6); text-align: center; min-width: 250px; }
     .toast-success { background: #1b4721; border: 1px solid #4ade80; color: #4ade80; }
     .toast-error { background: #451a1a; border: 1px solid #f87171; color: #f87171; }
   </style>
@@ -170,30 +169,28 @@
     <div class="header-top-row">
       <div class="brand-logo">DURGA ONLINE</div>
       
-      <!-- BAL & UPLINE BOX -->
       <div class="balance-badge-box">
         <div>Bal : <strong id="headerBal">0</strong></div>
         <div>Upline : <strong class="upline-text" id="headerUpline">0</strong></div>
       </div>
     </div>
 
-    <!-- CLEAN HORIZONTAL NAVBAR -->
+    <!-- HORIZONTAL NAVBAR -->
     <div class="nav-bar-row">
       <button class="nav-tab-btn active" id="btnTabMarket" onclick="switchTab('tabMarket')">Market ▾</button>
       <button class="nav-tab-btn" id="btnTabAccounts" onclick="switchTab('tabAccounts')"><span id="tabAccountsTitle">Client List</span> ▾</button>
       <button class="nav-tab-btn" id="btnTabCreate" onclick="switchTab('tabCreate')"><span id="tabCreateTitle">Create Client</span></button>
-
-      <div class="user-menu-container">
-        <button class="user-menu-btn" onclick="toggleUserDropdown()"><span id="adminUsernameDisplay">Admin</span> ▾</button>
-        <div class="dropdown-box" id="userDropdown">
-          <div class="dropdown-item" onclick="switchTab('tabStatement')">📜 Statement</div>
-          <div class="dropdown-item" onclick="openSelfPasswordModal()">🔑 Change Password</div>
-          <div class="dropdown-item" onclick="switchTab('tabTopPerformers')">🏆 <span id="menuTopTitle">Top Clients</span></div>
-          <div class="dropdown-item" onclick="switchTab('tabWeeklyReport')">📊 Weekly Report</div>
-          <div class="dropdown-item logout" onclick="adminLogout()">🚪 Logout</div>
-        </div>
-      </div>
+      <button class="user-menu-btn" id="userMenuBtn" onclick="toggleUserDropdown(event)"><span id="adminUsernameDisplay">Admin</span> ▾</button>
     </div>
+  </div>
+
+  <!-- DROPDOWN POPUP -->
+  <div class="dropdown-box" id="userDropdown">
+    <div class="dropdown-item" onclick="switchTab('tabStatement')">📜 Statement</div>
+    <div class="dropdown-item" onclick="openSelfPasswordModal()">🔑 Change Password</div>
+    <div class="dropdown-item" onclick="switchTab('tabTopPerformers')">🏆 <span id="menuTopTitle">Top Clients</span></div>
+    <div class="dropdown-item" onclick="switchTab('tabWeeklyReport')">📊 Weekly Report</div>
+    <div class="dropdown-item logout" onclick="adminLogout()">🚪 Logout</div>
   </div>
 
   <div class="container">
@@ -364,13 +361,17 @@
       setTimeout(() => { toast.style.display = 'none'; }, 2500);
     }
 
-    function toggleUserDropdown() {
-      document.getElementById('userDropdown').classList.toggle('show');
+    function toggleUserDropdown(event) {
+      if (event) event.stopPropagation();
+      const dd = document.getElementById('userDropdown');
+      dd.classList.toggle('show');
     }
 
     document.addEventListener('click', function(e) {
-      if(!e.target.closest('.user-menu-container')) {
-        document.getElementById('userDropdown').classList.remove('show');
+      const dd = document.getElementById('userDropdown');
+      const btn = document.getElementById('userMenuBtn');
+      if (dd && !dd.contains(e.target) && e.target !== btn) {
+        dd.classList.remove('show');
       }
     });
 
@@ -380,7 +381,9 @@
     }
 
     function switchTab(tabId) {
-      document.getElementById('userDropdown').classList.remove('show');
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.remove('show');
+
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
 
@@ -693,7 +696,9 @@
     }
 
     async function openSelfPasswordModal() {
-      document.getElementById('userDropdown').classList.remove('show');
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.remove('show');
+
       const oldPass = prompt('Enter Current Password:');
       if (!oldPass) return;
       const newPass = prompt('Enter New Password:');
