@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Durga Online - Admin Management Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --bg: #090c10;
@@ -16,6 +17,7 @@
     * { box-sizing: border-box; }
     body { background: var(--bg); color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
 
+    /* HEADER */
     .admin-header {
       background: #000000;
       padding: 10px 12px;
@@ -133,107 +135,48 @@
     .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; margin-bottom: 15px; }
     .card-title { margin-top: 0; font-size: 15px; color: var(--text-gold); border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 12px; }
 
-    .filter-bar {
+    /* LIVE MARKET RATES MONITORING CARDS (MATCHING REFERENCE IMAGE) */
+    .market-list { display: flex; flex-direction: column; gap: 9px; }
+    .market-card {
+      background: #13171f;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 12px 14px;
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      justify-content: space-between;
       align-items: center;
     }
-    .filter-bar input {
-      flex: 1;
-      padding: 8px 12px;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      color: #fff;
-      border-radius: 4px;
-      font-size: 13px;
-    }
+    .market-left { display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
+    .market-name-row { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: bold; color: #ffffff; }
+    .flag-icon { font-size: 16px; line-height: 1; }
+    .market-subtext { font-size: 11px; color: #8b949e; margin-left: 22px; white-space: nowrap; }
 
-    /* CARD-BASED CLIENT LIST UI */
-    .client-card-item {
-      background: #ffffff;
-      color: #000000;
-      border-radius: 6px;
-      margin-bottom: 12px;
-      overflow: hidden;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-    }
-    .client-header-row {
-      background: #d4a359;
-      color: #ffffff;
-      padding: 6px 10px;
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-      font-size: 10px;
-      font-weight: 800;
-      text-align: center;
-      text-transform: uppercase;
-    }
-    .client-data-row {
-      padding: 10px;
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-      align-items: center;
-      text-align: center;
-      font-size: 12px;
-      font-weight: bold;
-      border-bottom: 1px solid #e1e4e8;
-    }
-    .badge-c {
-      background: #c28b38;
-      color: white;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 10px;
-      margin-right: 4px;
-    }
-    .username-cell {
-      display: flex;
-      align-items: center;
-      text-align: left;
-      font-size: 13px;
-      font-weight: 800;
-      color: #111;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .market-mid-graph { flex: 1; height: 42px; max-width: 140px; margin: 0 10px; position: relative; }
+    .market-mid-graph canvas { width: 100% !important; height: 100% !important; }
 
-    .lock-toggle-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3px;
-      border-radius: 4px;
-      transition: transform 0.1s ease;
-    }
-    .lock-toggle-btn:active { transform: scale(0.9); }
+    .market-right { text-align: right; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; min-width: 110px; }
+    .market-price { font-size: 15px; font-weight: bold; color: #ffffff; }
+    .market-change { font-size: 11px; font-weight: bold; }
+    .change-green { color: var(--text-green); }
+    .change-red { color: var(--text-red); }
+
+    /* CLIENT CARD UI */
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+    .filter-bar input { flex: 1; padding: 8px 12px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 13px; }
+
+    .client-card-item { background: #ffffff; color: #000000; border-radius: 6px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.4); }
+    .client-header-row { background: #d4a359; color: #ffffff; padding: 6px 10px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; font-size: 10px; font-weight: 800; text-align: center; text-transform: uppercase; }
+    .client-data-row { padding: 10px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; align-items: center; text-align: center; font-size: 12px; font-weight: bold; border-bottom: 1px solid #e1e4e8; }
+    .badge-c { background: #c28b38; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-right: 4px; }
+    .username-cell { display: flex; align-items: center; text-align: left; font-size: 13px; font-weight: 800; color: #111; overflow: hidden; text-overflow: ellipsis; }
+
+    .lock-toggle-btn { background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 3px; border-radius: 4px; }
     .lock-icon-svg { width: 19px; height: 19px; }
     .lock-green { color: #238636; fill: #238636; }
     .lock-red { color: #da3633; fill: #da3633; }
 
-    .client-actions-strip {
-      padding: 8px 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      background: #f7f9fa;
-    }
-    .btn-action-pill {
-      background: #0d2847;
-      color: #ffffff;
-      border: none;
-      padding: 5px 9px;
-      border-radius: 3px;
-      font-size: 10px;
-      font-weight: 800;
-      cursor: pointer;
-      letter-spacing: 0.3px;
-      transition: 0.15s;
-    }
-    .btn-action-pill:hover, .btn-action-pill:active { background: #174275; }
+    .client-actions-strip { padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 5px; background: #f7f9fa; }
+    .btn-action-pill { background: #0d2847; color: #ffffff; border: none; padding: 5px 9px; border-radius: 3px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
     .form-grid { display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
     .form-grid input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-size: 14px; }
@@ -274,7 +217,8 @@
 
     <!-- HORIZONTAL NAVBAR -->
     <div class="nav-bar-row">
-      <button class="nav-tab-btn active" id="btnTabMarket" onclick="switchTab('tabMarket')">Market ▾</button>
+      <button class="nav-tab-btn active" id="btnTabHome" onclick="switchTab('tabHome')">Home ▾</button>
+      <button class="nav-tab-btn" id="btnTabMarket" onclick="switchTab('tabMarket')">Market Analysis ▾</button>
       <button class="nav-tab-btn" id="btnTabAccounts" onclick="switchTab('tabAccounts')"><span id="tabAccountsTitle">Client List</span> ▾</button>
       <button class="nav-tab-btn" id="btnTabCreate" onclick="switchTab('tabCreate')"><span id="tabCreateTitle">Create Client</span></button>
       <button class="user-menu-btn" id="userMenuBtn" onclick="toggleUserDropdown(event)"><span id="adminUsernameDisplay">Admin</span> ▾</button>
@@ -292,8 +236,16 @@
 
   <div class="container">
 
-    <!-- 1. MARKET ANALYSIS TAB -->
-    <div class="tab-content active" id="tabMarket">
+    <!-- 1. DEFAULT HOME TAB (LIVE MARKET RATES & SPARKLINES WITHOUT OPEN BUTTON) -->
+    <div class="tab-content active" id="tabHome">
+      <div class="card">
+        <h3 class="card-title">Live Global Market Indices</h3>
+        <div class="market-list" id="homeMarketsList">Loading Live Markets...</div>
+      </div>
+    </div>
+
+    <!-- 2. MARKET ANALYSIS TAB -->
+    <div class="tab-content" id="tabMarket">
       <div class="card">
         <h3 class="card-title">Live Market Analysis (Active Predictions)</h3>
         <div style="overflow-x: auto;">
@@ -316,7 +268,7 @@
       </div>
     </div>
 
-    <!-- 2. CLIENT / ADMIN LIST TAB -->
+    <!-- 3. CLIENT / ADMIN LIST TAB -->
     <div class="tab-content" id="tabAccounts">
       <div class="card">
         <h3 class="card-title" id="accountListCardTitle">Registered Client Accounts</h3>
@@ -331,7 +283,7 @@
       </div>
     </div>
 
-    <!-- 3. CREATE ACCOUNT TAB -->
+    <!-- 4. CREATE ACCOUNT TAB -->
     <div class="tab-content" id="tabCreate">
       <div class="card">
         <h3 class="card-title" id="createCardTitle">Create Client Account</h3>
@@ -344,7 +296,7 @@
       </div>
     </div>
 
-    <!-- 4. ADMIN SELF STATEMENT TAB -->
+    <!-- 5. ADMIN SELF STATEMENT TAB -->
     <div class="tab-content" id="tabStatement">
       <div class="card">
         <h3 class="card-title">Admin Self Activity & Coin Distribution Ledger</h3>
@@ -368,7 +320,7 @@
       </div>
     </div>
 
-    <!-- 5. TOP CLIENTS / TOP ADMINS TAB -->
+    <!-- 6. TOP CLIENTS / TOP ADMINS TAB -->
     <div class="tab-content" id="tabTopPerformers">
       <div class="card">
         <h3 class="card-title" id="topPerformersCardTitle">Top Performers Ranking</h3>
@@ -391,7 +343,7 @@
       </div>
     </div>
 
-    <!-- 6. WEEKLY REPORT TAB -->
+    <!-- 7. WEEKLY REPORT TAB -->
     <div class="tab-content" id="tabWeeklyReport">
       <div class="card">
         <h3 class="card-title">Weekly Performance Summary (Last 7 Days)</h3>
@@ -438,6 +390,15 @@
   </div>
 
   <script>
+    const MARKETS_CONFIG = [
+      { name: 'KOSPI', flag: '🇰🇷', sub: 'Korea Composite Index', defaultRate: '2,681.49', defaultChange: '-18.20 (-0.67%)', isPos: false, defaultSpark: [2700, 2695, 2690, 2685, 2680, 2681] },
+      { name: 'HANG SENG', flag: '🇭🇰', sub: 'Hong Kong', defaultRate: '18,813.45', defaultChange: '+196.92 (+1.06%)', isPos: true, defaultSpark: [18600, 18650, 18700, 18780, 18813] },
+      { name: 'SENSEX', flag: '🇮🇳', sub: 'India', defaultRate: '76,410.25', defaultChange: '+746.95 (+0.99%)', isPos: true, defaultSpark: [75800, 75900, 76100, 76350, 76410] },
+      { name: 'DAX', flag: '🇩🇪', sub: 'Germany', defaultRate: '18,638.56', defaultChange: '+199.18 (+1.08%)', isPos: true, defaultSpark: [18450, 18500, 18580, 18610, 18638] },
+      { name: 'DOW JONES', flag: '🇺🇸', sub: 'United States', defaultRate: '38,798.99', defaultChange: '+222.86 (+0.58%)', isPos: true, defaultSpark: [38550, 38620, 38700, 38750, 38798] }
+    ];
+
+    let chartInstances = {};
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
     let adminSession = null;
     let allAccountsList = [];
@@ -492,9 +453,13 @@
       const target = document.getElementById(tabId);
       if (target) {
         target.classList.add('active');
-        localStorage.setItem('adminActiveTab', tabId); // Save state on switch
+        localStorage.setItem('adminActiveTab', tabId);
       }
       
+      if(tabId === 'tabHome') {
+        document.getElementById('btnTabHome').classList.add('active');
+        fetchLiveMarkets();
+      }
       if(tabId === 'tabMarket') {
         document.getElementById('btnTabMarket').classList.add('active');
         loadMarketAnalysis();
@@ -545,6 +510,98 @@
           document.getElementById('headerUpline').innerText = data.upline !== undefined ? data.upline : 0;
         }
       } catch(e){}
+    }
+
+    // FETCH LIVE MARKETS FOR HOME SCREEN
+    async function fetchLiveMarkets() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/market/results`);
+        const results = await res.json();
+        const resMap = {};
+        if (Array.isArray(results)) {
+          results.forEach(r => resMap[r.market] = r);
+        }
+        renderHomeMarkets(resMap);
+      } catch(e) {
+        renderHomeMarkets({});
+      }
+    }
+
+    function renderHomeMarkets(resMap = {}) {
+      let html = '';
+      MARKETS_CONFIG.forEach(m => {
+        const serverData = resMap[m.name];
+        const rateStr = (serverData && serverData.closingValue !== '0.00') ? serverData.closingValue : m.defaultRate;
+        const isPos = serverData ? serverData.isPositive : m.isPos;
+        const changeStr = (serverData && serverData.change) ? `${serverData.change} (${serverData.percentChange})` : m.defaultChange;
+        const colorClass = isPos ? 'change-green' : 'change-red';
+        const cleanId = m.name.replace(/\s+/g, '');
+
+        html += `
+          <div class="market-card">
+            <div class="market-left">
+              <div class="market-name-row">
+                <span class="flag-icon">${m.flag}</span>
+                <span>${m.name}</span>
+              </div>
+              <div class="market-subtext">${m.sub}</div>
+            </div>
+
+            <div class="market-mid-graph">
+              <canvas id="admin-chart-${cleanId}"></canvas>
+            </div>
+
+            <div class="market-right">
+              <div class="market-price">${rateStr}</div>
+              <div class="market-change ${colorClass}">${changeStr}</div>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('homeMarketsList').innerHTML = html;
+
+      MARKETS_CONFIG.forEach(m => {
+        const cleanId = m.name.replace(/\s+/g, '');
+        const serverData = resMap[m.name];
+        const sparkData = (serverData && serverData.sparkline && serverData.sparkline.length > 2) ? serverData.sparkline : m.defaultSpark;
+        const isPos = serverData ? serverData.isPositive : m.isPos;
+        renderWaveChart(`admin-chart-${cleanId}`, sparkData, isPos);
+      });
+    }
+
+    function renderWaveChart(canvasId, dataPoints, isPositive) {
+      const ctx = document.getElementById(canvasId);
+      if (!ctx) return;
+
+      if (chartInstances[canvasId]) {
+        chartInstances[canvasId].destroy();
+      }
+
+      const lineColor = isPositive ? '#3fb950' : '#f85149';
+      const bgColor = isPositive ? 'rgba(63, 185, 80, 0.25)' : 'rgba(248, 81, 73, 0.25)';
+
+      chartInstances[canvasId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dataPoints.map((_, i) => i),
+          datasets: [{
+            data: dataPoints,
+            borderColor: lineColor,
+            borderWidth: 1.8,
+            fill: true,
+            backgroundColor: bgColor,
+            tension: 0.35,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: { x: { display: false }, y: { display: false } },
+          animation: { duration: 300 }
+        }
+      });
     }
 
     async function handleCreateAccount(ev) {
@@ -991,15 +1048,15 @@
       } catch(e) { alert('Server error'); }
     }
 
-    // INITIALIZATION WITH RESTORED TAB
+    // INITIALIZATION (RESTORE SAVED TAB OR DEFAULT TO HOME)
     setupPanelUI();
     refreshAdminWallet();
 
-    const savedTab = localStorage.getItem('adminActiveTab') || 'tabMarket';
+    const savedTab = localStorage.getItem('adminActiveTab') || 'tabHome';
     switchTab(savedTab);
 
     setInterval(refreshAdminWallet, 4000);
-    setInterval(loadMarketAnalysis, 8000);
+    setInterval(fetchLiveMarkets, 10000);
   </script>
 </body>
 </html>
