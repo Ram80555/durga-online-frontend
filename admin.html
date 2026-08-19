@@ -27,7 +27,6 @@
       min-height: 100vh;
     }
 
-    /* FROSTED HEADER */
     .admin-header {
       background: rgba(8, 12, 18, 0.88);
       backdrop-filter: blur(16px);
@@ -43,7 +42,6 @@
       z-index: 100;
     }
 
-    /* TOP ROW WITH LOGO, BAL/UPLINE, USER & 4-LINE MENU */
     .header-top-row {
       display: flex;
       justify-content: space-between;
@@ -52,11 +50,7 @@
       gap: 6px;
     }
 
-    .brand-section {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    .brand-section { display: flex; flex-direction: column; gap: 2px; }
     .brand-logo {
       font-size: 15px;
       font-weight: 900;
@@ -72,7 +66,6 @@
       gap: 6px;
     }
 
-    /* 3D WHITE EMBOSSED BADGE BOX */
     .balance-badge-box {
       background: linear-gradient(145deg, #ffffff, #f0f3f6);
       color: #0b1017;
@@ -91,7 +84,6 @@
     .balance-badge-box strong { font-size: 11px; font-weight: 800; }
     .upline-text { color: #0d1117; font-style: italic; font-weight: 900; }
 
-    /* USER & ROLE BADGE CLUSTER */
     .user-profile-cluster {
       display: flex;
       align-items: center;
@@ -135,7 +127,6 @@
       color: #ffffff;
     }
 
-    /* 4-LINE MENU ICON BUTTON */
     .menu-lines-btn {
       background: linear-gradient(180deg, #243042 0%, #151e2a 100%);
       border: 1px solid var(--text-gold);
@@ -162,7 +153,6 @@
       border-radius: 1px;
     }
 
-    /* 4 CORE TABS ROW (100% WIDTH FIT) */
     .nav-bar-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -194,7 +184,6 @@
       transform: translateY(-1px);
     }
 
-    /* DROPDOWN POPUP */
     .dropdown-box {
       position: fixed;
       top: 50px;
@@ -206,7 +195,7 @@
       border-radius: 8px;
       display: none;
       flex-direction: column;
-      width: 185px;
+      width: 195px;
       z-index: 99999;
       box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
       overflow: hidden;
@@ -224,9 +213,10 @@
       gap: 8px;
     }
     .dropdown-item:hover, .dropdown-item:active { background: rgba(255, 184, 0, 0.1); color: var(--text-gold); }
+    .dropdown-item.danger-item { color: #ff3d57; font-weight: 800; background: rgba(255, 61, 87, 0.08); }
+    .dropdown-item.danger-item:hover { background: rgba(255, 61, 87, 0.2); }
     .dropdown-item.logout { color: #ff5252; border-bottom: none; }
 
-    /* CONTAINER & CARDS */
     .container { padding: 12px; max-width: 1100px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -251,7 +241,6 @@
       margin-bottom: 12px;
     }
 
-    /* 3D GLASS MARKET MONITORING CARDS */
     .market-list { display: flex; flex-direction: column; gap: 10px; }
     .market-card {
       background: linear-gradient(135deg, rgba(22, 30, 42, 0.8) 0%, rgba(13, 18, 26, 0.85) 100%);
@@ -277,7 +266,6 @@
     .change-green { color: var(--text-green); text-shadow: 0 0 8px rgba(0, 230, 118, 0.35); }
     .change-red { color: var(--text-red); text-shadow: 0 0 8px rgba(255, 61, 87, 0.35); }
 
-    /* CLIENT CARDS */
     .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
     .filter-bar input {
       flex: 1;
@@ -465,6 +453,50 @@
     .dialog-btn-danger { background: linear-gradient(180deg, #ff3d57 0%, #d50000 100%); color: #ffffff; }
     .dialog-btn-cancel { background: rgba(255, 255, 255, 0.08); color: #c4d1db; border: 1px solid rgba(255, 255, 255, 0.1); }
 
+    /* 10-SEC COUNTDOWN EMERGENCY POPUP */
+    .countdown-overlay {
+      position: fixed;
+      top:0; left:0; width:100%; height:100%;
+      background: rgba(20, 0, 5, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000002;
+      padding: 16px;
+    }
+    .countdown-card {
+      background: linear-gradient(145deg, #2a0b12, #160408);
+      border: 2px solid #ff3d57;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 340px;
+      padding: 24px 18px;
+      box-shadow: 0 0 40px rgba(255, 61, 87, 0.4);
+      text-align: center;
+    }
+    .countdown-timer-circle {
+      font-size: 54px;
+      font-weight: 900;
+      color: #ff1744;
+      margin: 12px 0;
+      text-shadow: 0 0 20px rgba(255, 23, 68, 0.8);
+    }
+    .btn-abort {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(180deg, #2ebd49, #1b8733);
+      color: white;
+      font-size: 15px;
+      font-weight: 900;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(46, 189, 73, 0.4);
+      letter-spacing: 0.5px;
+    }
+
     /* TOAST */
     .toast-box {
       position: fixed;
@@ -502,6 +534,18 @@
         <button class="dialog-btn dialog-btn-cancel" onclick="closeActionDialog()">CANCEL</button>
         <button class="dialog-btn dialog-btn-primary" id="dialogSubmitBtn">CONFIRM</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 10-SEC COUNTDOWN WIPEOUT WARNING MODAL -->
+  <div class="countdown-overlay" id="countdownOverlay">
+    <div class="countdown-card">
+      <h3 style="color: #ff3d57; margin: 0; font-size: 17px; font-weight: 900; letter-spacing: 0.5px;">⚠️ SYSTEM WIPEOUT IN PROGRESS</h3>
+      <p style="font-size: 12px; color: #ffb4c0; margin: 8px 0 0 0;">All Admins, Clients, Bets, Statements & Database will be permanently deleted in:</p>
+      
+      <div class="countdown-timer-circle" id="countdownValue">10</div>
+      
+      <button class="btn-abort" onclick="abortDataWipeout()">🛑 ABORT / CANCEL RESET</button>
     </div>
   </div>
 
@@ -552,6 +596,10 @@
     <div class="dropdown-item" onclick="openSelfPasswordModal()">🔑 Change Password</div>
     <div class="dropdown-item" onclick="switchTab('tabTopPerformers')">🏆 <span id="menuTopTitle">Top Clients</span></div>
     <div class="dropdown-item" onclick="switchTab('tabWeeklyReport')">📊 Weekly Report</div>
+    
+    <!-- CLEAR ALL DATA (ONLY FOR SUPER ADMIN) -->
+    <div class="dropdown-item danger-item" id="menuClearAllData" style="display: none;" onclick="initiateClearAllData()">⚠️ Clear All Data</div>
+    
     <div class="dropdown-item logout" onclick="adminLogout()">🚪 Logout</div>
   </div>
 
@@ -723,6 +771,8 @@
     const BACKEND_URL = 'https://durga-online-backend.onrender.com';
     let adminSession = null;
     let allAccountsList = [];
+    let wipeoutTimerInterval = null;
+    let verifiedWipeoutPassword = null;
 
     try {
       adminSession = JSON.parse(localStorage.getItem('durgaUser'));
@@ -846,6 +896,9 @@
         document.getElementById('createBtn').innerText = 'CREATE ADMIN';
         document.getElementById('menuTopTitle').innerText = 'Top Admins';
         document.getElementById('topPerformersCardTitle').innerText = 'Top Admin Rankings (Turnover & Settlement)';
+        
+        // Show Clear All Data only to Superadmin
+        document.getElementById('menuClearAllData').style.display = 'flex';
       } else {
         roleBadge.innerText = 'ADMIN';
         roleBadge.className = 'role-badge badge-admin';
@@ -856,6 +909,83 @@
         document.getElementById('createBtn').innerText = 'CREATE CLIENT';
         document.getElementById('menuTopTitle').innerText = 'Top Clients';
         document.getElementById('topPerformersCardTitle').innerText = 'Top Client Rankings';
+
+        document.getElementById('menuClearAllData').style.display = 'none';
+      }
+    }
+
+    // EMERGENCY: CLEAR ALL DATA WITH 10-SEC COUNTDOWN & ABORT
+    function initiateClearAllData() {
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.remove('show');
+
+      if (!isSuperAdmin) return;
+
+      openActionDialog({
+        title: '⚠️ Authorize Master Reset',
+        desc: 'Enter <strong>Super Admin Password</strong> to verify and initiate complete database wipeout:',
+        inputs: [{ type: 'password', placeholder: 'Super Admin Password' }],
+        confirmBtnText: 'VERIFY & START TIMER',
+        confirmBtnClass: 'dialog-btn-danger',
+        onConfirm: (values) => {
+          const pass = values[0] ? values[0].trim() : '';
+          if (!pass) return showToast('Password required!', false);
+
+          verifiedWipeoutPassword = pass;
+          closeActionDialog();
+          startWipeoutCountdown();
+        }
+      });
+    }
+
+    function startWipeoutCountdown() {
+      let secondsLeft = 10;
+      document.getElementById('countdownValue').innerText = secondsLeft;
+      document.getElementById('countdownOverlay').style.display = 'flex';
+
+      clearInterval(wipeoutTimerInterval);
+      wipeoutTimerInterval = setInterval(async () => {
+        secondsLeft -= 1;
+        document.getElementById('countdownValue').innerText = secondsLeft;
+
+        if (secondsLeft <= 0) {
+          clearInterval(wipeoutTimerInterval);
+          document.getElementById('countdownValue').innerText = '0';
+          await executeDatabaseWipeout();
+        }
+      }, 1000);
+    }
+
+    function abortDataWipeout() {
+      clearInterval(wipeoutTimerInterval);
+      document.getElementById('countdownOverlay').style.display = 'none';
+      verifiedWipeoutPassword = null;
+      showToast('🛑 Master Reset Aborted! No data was touched.', true);
+    }
+
+    async function executeDatabaseWipeout() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/superadmin/clear-all-data`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            superAdminUsername: adminSession.username,
+            password: verifiedWipeoutPassword
+          })
+        });
+
+        const data = await res.json();
+        document.getElementById('countdownOverlay').style.display = 'none';
+
+        if (res.ok) {
+          alert('DATABASE WIPED SUCCESSFULLY! System has been restored to fresh state. Please login again.');
+          adminLogout();
+        } else {
+          alert('Failed: ' + (data.msg || 'Incorrect Password / Authorization Failed.'));
+        }
+      } catch (err) {
+        alert('Server communication error during wipeout.');
+        document.getElementById('countdownOverlay').style.display = 'none';
       }
     }
 
