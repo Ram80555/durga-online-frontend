@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Durga Online - Master Admin Login</title>
+  <style>
+    :root {
+      --bg: #06090e;
+      --card-bg: #11161f;
+      --card-border: #30363d;
+      --text-gold: #ffb400;
+      --purple: #8957e5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: #e6edf3;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+    }
+    .login-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 30px 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+      text-align: center;
+    }
+    .brand-title {
+      color: var(--text-gold);
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .badge {
+      display: inline-block;
+      background: #6e40c9;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background: #090d13;
+      border: 1px solid #30363d;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus { border-color: var(--purple); }
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: #6e40c9;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-login:hover:not(:disabled) { background: #8957e5; }
+    .error-msg {
+      color: #f85149;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <div class="brand-title">DURGA ONLINE</div>
+    <div class="badge">SECURE MANAGEMENT PORTAL</div>
+    
+    <input type="text" id="adminUsername" placeholder="Admin Username" autocomplete="username">
+    <input type="password" id="adminPassword" placeholder="Admin Password" autocomplete="current-password">
+    
+    <button class="btn-login" id="adminLoginBtn" onclick="handleAdminLogin()">ADMIN LOGIN</button>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://durga-online-backend.onrender.com';
+
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') handleAdminLogin();
+    });
+
+    async function handleAdminLogin() {
+      const uInput = document.getElementById('adminUsername');
+      const pInput = document.getElementById('adminPassword');
+      const btn = document.getElementById('adminLoginBtn');
+      const err = document.getElementById('errorMsg');
+
+      const username = uInput.value.trim();
+      const password = pInput.value.trim();
+
+      if (!username || !password) {
+        err.innerText = 'Please enter both Admin Username and Password!';
+        err.style.display = 'block';
+        return;
+      }
+
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = 'VERIFYING...';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.user) {
+          // Verify that the user is actually an Admin or Super Admin
+          if (data.user.role !== 'admin' && data.user.role !== 'superadmin' && data.user.username.toLowerCase() !== 'vikram16') {
+            err.innerText = 'Access Denied: You are not authorized as Admin!';
+            err.style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = 'ADMIN LOGIN';
+            return;
+          }
+
+          localStorage.setItem('durgaUser', JSON.stringify(data.user));
+          window.location.href = 'admin.html';
+        } else {
+          err.innerText = data.msg || 'Invalid Admin Credentials!';
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.innerText = 'ADMIN LOGIN';
+        }
+      } catch (e) {
+        err.innerText = 'Server error. Please try again.';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerText = 'ADMIN LOGIN';
+      }
+    }
+  </script>
+</body>
+</html>
